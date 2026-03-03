@@ -124,20 +124,16 @@ public class StudentView {
                     break;
                 case "3":
                     System.out.println("→ Xem khóa học đã đăng kí");
-                    userLogin = null;
-                    return;
+                    break;
                 case "4":
                     System.out.println("Hủy đăng kí...");
-                    userLogin = null;
-                    return;
+                    break;
                 case "5":
                     System.out.println("Đổi mật khẩu...");
-                    userLogin = null;
-                    return;
+                    break;
                 case "6":
                     System.out.println("Đăng xuất...");
-                    userLogin = null;
-                    return;
+                    break;
                 default:
                     System.out.println("❌ Lựa chọn không hợp lệ!");
             }
