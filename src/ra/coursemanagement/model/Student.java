@@ -2,6 +2,8 @@ package ra.coursemanagement.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 
 public class Student {
 
@@ -42,8 +44,8 @@ public class Student {
 
     // Getter & Setter
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -66,9 +68,63 @@ public class Student {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
+    public void inputData(Scanner sc) {
+
+        System.out.print("Nhập tên: ");
+        while (true) {
+            name = sc.nextLine().trim();
+            if (!name.isEmpty()) break;
+            System.out.print("❌ Không được để trống. Nhập lại: ");
+        }
+
+        while (true) {
+            try {
+                System.out.print("Nhập ngày sinh (yyyy-MM-dd): ");
+                dob = LocalDate.parse(sc.nextLine());
+                break;
+            } catch (Exception e) {
+                System.out.println("❌ Sai định dạng!");
+            }
+        }
+
+        System.out.print("Nhập email: ");
+        while (true) {
+            email = sc.nextLine().trim();
+            if (!email.isEmpty() && email.contains("@")) break;
+            System.out.print("❌ Email không hợp lệ. Nhập lại: ");
+        }
+
+        while (true) {
+            System.out.print("Giới tính (1-Nam | 0-Nữ): ");
+            String input = sc.nextLine();
+            if (input.equals("1") || input.equals("0")) {
+                sex = input.equals("1");
+                break;
+            }
+            System.out.println("❌ Chỉ nhập 1 hoặc 0");
+        }
+
+        System.out.print("Nhập số điện thoại: ");
+        phone = sc.nextLine();
+
+        while (true) {
+            System.out.print("Nhập mật khẩu: ");
+            password = sc.nextLine();
+            if (password.length() >= 6) break;
+            System.out.println("❌ Mật khẩu >= 6 ký tự");
+        }
+    }
     @Override
     public String toString() {
-        return String.format("%-5d | %-20s | %-15s | %-25s | %-5s",
-                id, name, dob, email, (sex ? "Nam" : "Nữ"));
+        return String.format("%-5d %-20s %-12s %-25s %-6s %-15s %-20s",
+                id,
+                name,
+                dob,
+                email,
+                (sex ? "Nam" : "Nữ"),
+                phone == null ? "" : phone,
+                createdAt == null ? "" :
+                        createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        );
     }
 }

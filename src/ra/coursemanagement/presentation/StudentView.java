@@ -34,7 +34,6 @@ public class StudentView {
                 continue;
             }
 
-            // So sánh password đã hash
             if (!BCrypt.checkpw(password, student.getPassword())) {
                 System.out.println("❌ Sai mật khẩu!");
                 continue;

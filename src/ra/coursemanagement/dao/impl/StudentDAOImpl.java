@@ -195,4 +195,35 @@ public class StudentDAOImpl implements IStudentDAO {
 
         return list;
     }
+
+    @Override
+    public List<Student> sort(String field, String direction) {
+
+        List<Student> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM student ORDER BY " + field + " " + direction;
+        if (!field.equals("name") && !field.equals("id")) {
+            field = "id";
+        }
+
+        if (!direction.equalsIgnoreCase("ASC") &&
+                !direction.equalsIgnoreCase("DESC")) {
+            direction = "ASC";
+        }
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapResultSet(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }

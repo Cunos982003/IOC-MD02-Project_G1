@@ -9,4 +9,5 @@ public interface IStudentDAO extends IBaseDAO<Student, Integer> {
     Student findByEmail(String email);
     Student login(String email, String password);
     List<Student> searchByName(String keyword);
+    List<Student> sort(String field, String direction);
 }

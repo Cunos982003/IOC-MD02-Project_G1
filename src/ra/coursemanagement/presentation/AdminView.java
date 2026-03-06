@@ -56,6 +56,7 @@ public class AdminView {
                     break;
                 case "2":
                     System.out.println("→ Quản lý học viên");
+                    StudentManagementView.showStudentMenu(sc);
                     break;
                 case "3":
                     System.out.println("→ Quản lý đăng ký học");
