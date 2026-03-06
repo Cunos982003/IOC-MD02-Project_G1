@@ -53,9 +53,13 @@ public class StudentManagementView {
         }
     }
 
-    // ================== HIỂN THỊ ==================
     private static void showList() {
         List<Student> list = studentService.findAll();
+
+        if (list.isEmpty()) {
+            System.out.println("Danh sách học viên trống!");
+            return;
+        }
 
         System.out.println("\n===== DANH SÁCH HỌC VIÊN =====");
         System.out.printf("%-5s %-20s %-12s %-25s %-6s %-15s\n",
@@ -160,30 +164,69 @@ public class StudentManagementView {
     }
 
     private static void sortStudent(Scanner sc) {
+
         List<Student> list = studentService.findAll();
 
-        System.out.println("1. Theo tên tăng");
-        System.out.println("2. Theo tên giảm");
-        System.out.println("3. Theo ID tăng");
-        System.out.println("4. Theo ID giảm");
-
-        String choice = sc.nextLine();
-
-        switch (choice) {
-            case "1":
-                list.sort(Comparator.comparing(Student::getName));
-                break;
-            case "2":
-                list.sort(Comparator.comparing(Student::getName).reversed());
-                break;
-            case "3":
-                list.sort(Comparator.comparing(Student::getId));
-                break;
-            case "4":
-                list.sort(Comparator.comparing(Student::getId).reversed());
-                break;
+        if (list.isEmpty()) {
+            System.out.println("Danh sách học viên trống!");
+            return;
         }
 
-        list.forEach(s -> System.out.println(s.getId() + " - " + s.getName()));
+        while (true) {
+
+            System.out.println("\n===== SẮP XẾP HỌC VIÊN =====");
+            System.out.println("1. Theo tên tăng dần");
+            System.out.println("2. Theo tên giảm dần");
+            System.out.println("3. Theo ID tăng dần");
+            System.out.println("4. Theo ID giảm dần");
+            System.out.println("0. Quay lại");
+
+            System.out.print("Chọn: ");
+            String choice = sc.nextLine();
+
+            switch (choice) {
+
+                case "1":
+                    list.sort(Comparator.comparing(Student::getName));
+                    break;
+
+                case "2":
+                    list.sort(Comparator.comparing(Student::getName).reversed());
+                    break;
+
+                case "3":
+                    list.sort(Comparator.comparing(Student::getId));
+                    break;
+
+                case "4":
+                    list.sort(Comparator.comparing(Student::getId).reversed());
+                    break;
+
+                case "0":
+                    return;
+
+                default:
+                    System.out.println("Lựa chọn không hợp lệ!");
+                    continue;
+            }
+
+            System.out.println("\n===== DANH SÁCH HỌC VIÊN =====");
+
+            System.out.printf("%-5s %-20s %-12s %-25s %-8s\n",
+                    "ID", "Tên", "Ngày sinh", "Email", "Giới tính");
+
+            System.out.println("-------------------------------------------------------------------");
+
+            for (Student s : list) {
+                System.out.printf("%-5d %-20s %-12s %-25s %-8s\n",
+                        s.getId(),
+                        s.getName(),
+                        s.getDob(),
+                        s.getEmail(),
+                        s.isSex() ? "Nam" : "Nữ");
+            }
+
+            return;
+        }
     }
 }
