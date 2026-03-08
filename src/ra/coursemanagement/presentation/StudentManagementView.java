@@ -55,6 +55,10 @@ public class StudentManagementView {
 
     private static void showList() {
         List<Student> list = studentService.findAll();
+        printStudentTable(list);
+    }
+
+    private static void printStudentTable(List<Student> list) {
 
         if (list.isEmpty()) {
             System.out.println("Danh sách học viên trống!");
@@ -62,8 +66,10 @@ public class StudentManagementView {
         }
 
         System.out.println("\n===== DANH SÁCH HỌC VIÊN =====");
+
         System.out.printf("%-5s %-20s %-12s %-25s %-6s %-15s\n",
                 "ID", "Tên", "Ngày sinh", "Email", "Giới", "SĐT");
+
         System.out.println("--------------------------------------------------------------------------");
 
         for (Student s : list) {
@@ -93,37 +99,49 @@ public class StudentManagementView {
     }
 
     private static void updateStudent(Scanner sc) {
+
         System.out.print("Nhập ID cần sửa: ");
         int id = Integer.parseInt(sc.nextLine());
 
         Student s = studentService.findById(id);
+
         if (s == null) {
             System.out.println("❌ Không tìm thấy!");
             return;
         }
 
         while (true) {
-            System.out.println("1. Sửa tên");
+
+            System.out.println("\n1. Sửa tên");
             System.out.println("2. Sửa email");
             System.out.println("3. Sửa SĐT");
             System.out.println("0. Quay lại");
+
             String choice = sc.nextLine();
 
             switch (choice) {
+
                 case "1":
                     System.out.print("Tên mới: ");
                     s.setName(sc.nextLine());
                     break;
+
                 case "2":
                     System.out.print("Email mới: ");
                     s.setEmail(sc.nextLine());
                     break;
+
                 case "3":
                     System.out.print("SĐT mới: ");
                     s.setPhone(sc.nextLine());
                     break;
+
                 case "0":
                     return;
+
+                default:
+                    System.out.println("Không hợp lệ!");
+                    continue;
             }
 
             studentService.update(s);
@@ -132,16 +150,19 @@ public class StudentManagementView {
     }
 
     private static void deleteStudent(Scanner sc) {
+
         System.out.print("Nhập ID cần xóa: ");
         int id = Integer.parseInt(sc.nextLine());
 
         Student s = studentService.findById(id);
+
         if (s == null) {
             System.out.println("❌ Không tồn tại!");
             return;
         }
 
         System.out.print("Bạn có chắc chắn xóa? (y/n): ");
+
         if (sc.nextLine().equalsIgnoreCase("y")) {
             studentService.delete(id);
             System.out.println("✅ Đã xóa!");
@@ -149,18 +170,19 @@ public class StudentManagementView {
     }
 
     private static void searchStudent(Scanner sc) {
+
         System.out.print("Nhập từ khóa: ");
         String keyword = sc.nextLine().toLowerCase();
 
         List<Student> list = studentService.findAll()
                 .stream()
                 .filter(s ->
-                        s.getName().toLowerCase().contains(keyword) ||
-                                s.getEmail().toLowerCase().contains(keyword) ||
-                                String.valueOf(s.getId()).contains(keyword))
+                        s.getName().toLowerCase().contains(keyword)
+                                || s.getEmail().toLowerCase().contains(keyword)
+                                || String.valueOf(s.getId()).contains(keyword))
                 .toList();
 
-        list.forEach(s -> System.out.println(s.getId() + " - " + s.getName()));
+        printStudentTable(list);
     }
 
     private static void sortStudent(Scanner sc) {
@@ -172,61 +194,38 @@ public class StudentManagementView {
             return;
         }
 
-        while (true) {
+        System.out.println("\n===== SẮP XẾP HỌC VIÊN =====");
+        System.out.println("1. Theo tên tăng");
+        System.out.println("2. Theo tên giảm");
+        System.out.println("3. Theo ID tăng");
+        System.out.println("4. Theo ID giảm");
 
-            System.out.println("\n===== SẮP XẾP HỌC VIÊN =====");
-            System.out.println("1. Theo tên tăng dần");
-            System.out.println("2. Theo tên giảm dần");
-            System.out.println("3. Theo ID tăng dần");
-            System.out.println("4. Theo ID giảm dần");
-            System.out.println("0. Quay lại");
+        System.out.print("Chọn: ");
+        String choice = sc.nextLine();
 
-            System.out.print("Chọn: ");
-            String choice = sc.nextLine();
+        switch (choice) {
 
-            switch (choice) {
+            case "1":
+                list.sort(Comparator.comparing(Student::getName));
+                break;
 
-                case "1":
-                    list.sort(Comparator.comparing(Student::getName));
-                    break;
+            case "2":
+                list.sort(Comparator.comparing(Student::getName).reversed());
+                break;
 
-                case "2":
-                    list.sort(Comparator.comparing(Student::getName).reversed());
-                    break;
+            case "3":
+                list.sort(Comparator.comparing(Student::getId));
+                break;
 
-                case "3":
-                    list.sort(Comparator.comparing(Student::getId));
-                    break;
+            case "4":
+                list.sort(Comparator.comparing(Student::getId).reversed());
+                break;
 
-                case "4":
-                    list.sort(Comparator.comparing(Student::getId).reversed());
-                    break;
-
-                case "0":
-                    return;
-
-                default:
-                    System.out.println("Lựa chọn không hợp lệ!");
-                    continue;
-            }
-
-            System.out.println("\n===== DANH SÁCH HỌC VIÊN =====");
-
-            System.out.printf("%-5s %-20s %-12s %-25s %-8s\n",
-                    "ID", "Tên", "Ngày sinh", "Email", "Giới tính");
-
-            System.out.println("-------------------------------------------------------------------");
-
-            for (Student s : list) {
-                System.out.printf("%-5d %-20s %-12s %-25s %-8s\n",
-                        s.getId(),
-                        s.getName(),
-                        s.getDob(),
-                        s.getEmail(),
-                        s.isSex() ? "Nam" : "Nữ");
-            }
-
-            return;
+            default:
+                System.out.println("❌ Không hợp lệ!");
+                return;
         }
+
+        printStudentTable(list);
     }
 }

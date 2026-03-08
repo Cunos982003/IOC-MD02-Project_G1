@@ -53,6 +53,7 @@ public class AdminView {
             switch (choice) {
                 case "1":
                     System.out.println("→ Quản lý khóa học");
+                    new CourseView().showCourseMenu();
                     break;
                 case "2":
                     System.out.println("→ Quản lý học viên");

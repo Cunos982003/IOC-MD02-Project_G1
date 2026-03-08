@@ -1,17 +1,22 @@
 package ra.coursemanagement.presentation;
 
 import org.mindrot.jbcrypt.BCrypt;
+import ra.coursemanagement.business.ICourseService;
 import ra.coursemanagement.business.IStudentService;
+import ra.coursemanagement.business.impl.CourseServiceImpl;
 import ra.coursemanagement.business.impl.StudentServiceImpl;
+import ra.coursemanagement.model.Course;
 import ra.coursemanagement.model.Student;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 public class StudentView {
 
     public static Student userLogin = null;
     private static final IStudentService studentService = new StudentServiceImpl();
+    private static final ICourseService courseService = new CourseServiceImpl();
     public static void showMenuLogin(Scanner sc) {
         while (true) {
             System.out.println("===== ĐĂNG NHẬP HỌC VIÊN =====");
@@ -105,11 +110,12 @@ public class StudentView {
         while (true) {
             System.out.println("\n===== MENU HỌC VIÊN =====");
             System.out.println("1. Xem danh sách khóa học");
-            System.out.println("2. Đăng kí khóa học");
-            System.out.println("3. Xem khóa học đã đăng kí");
-            System.out.println("4. Hủy đăng kí (nếu chưa bắt đầu)");
-            System.out.println("5. Đổi mật khẩu");
-            System.out.println("6. Đăng xuất");
+            System.out.println("2. Tìm kiếm khóa học");
+            System.out.println("3. Đăng ký khóa học");
+            System.out.println("4. Xem khóa học đã đăng ký");
+            System.out.println("5. Hủy đăng ký");
+            System.out.println("6. Đổi mật khẩu");
+            System.out.println("7. Đăng xuất");
             System.out.print("Chọn: ");
 
             String choice = sc.nextLine();
@@ -117,12 +123,15 @@ public class StudentView {
             switch (choice) {
                 case "1":
                     System.out.println("→ Hiển thị danh sách khóa học");
+                    showCourseList();
                     break;
                 case "2":
-                    System.out.println("→ Đăng kí khóa học");
+                    System.out.println("→ Tìm kiếm khóa học");
+                    searchCourse(sc);
                     break;
                 case "3":
                     System.out.println("→ Xem khóa học đã đăng kí");
+                    registerCourse(sc);
                     break;
                 case "4":
                     System.out.println("Hủy đăng kí...");
@@ -131,11 +140,104 @@ public class StudentView {
                     System.out.println("Đổi mật khẩu...");
                     break;
                 case "6":
-                    System.out.println("Đăng xuất...");
+                    changePassword(sc);
                     break;
+                case "7":
+                    System.out.println("Đăng xuất...");
+                    return;
                 default:
                     System.out.println("❌ Lựa chọn không hợp lệ!");
             }
         }
     }
+    private static void showCourseList() {
+
+        List<Course> list = courseService.findAll();
+
+        if (list.isEmpty()) {
+            System.out.println("Không có khóa học nào!");
+            return;
+        }
+
+        System.out.printf("%-5s %-20s %-10s %-20s\n",
+                "ID", "Tên khóa học", "Duration", "Instructor");
+
+        for (Course c : list) {
+            System.out.printf("%-5d %-20s %-10d %-20s\n",
+                    c.getId(),
+                    c.getName(),
+                    c.getDuration(),
+                    c.getInstructor());
+        }
+    }
+
+    private static void searchCourse(Scanner sc) {
+
+        System.out.print("Nhập tên khóa học: ");
+        String keyword = sc.nextLine();
+
+        List<Course> list = courseService.searchByName(keyword);
+
+        if (list.isEmpty()) {
+            System.out.println("❌ Không tìm thấy!");
+            return;
+        }
+
+        System.out.printf("%-5s %-20s %-10s %-20s\n",
+                "ID", "Tên khóa học", "Duration", "Instructor");
+
+        for (Course c : list) {
+            System.out.printf("%-5d %-20s %-10d %-20s\n",
+                    c.getId(),
+                    c.getName(),
+                    c.getDuration(),
+                    c.getInstructor());
+        }
+    }
+
+    private static void registerCourse(Scanner sc) {
+
+        showCourseList();
+
+        System.out.print("Nhập ID khóa học muốn đăng ký: ");
+        int id = Integer.parseInt(sc.nextLine());
+
+        Course course = courseService.findById(id);
+
+        if (course == null) {
+            System.out.println("❌ Khóa học không tồn tại!");
+            return;
+        }
+
+        System.out.println("✅ Đăng ký khóa học thành công!");
+    }
+
+    private static void changePassword(Scanner sc) {
+
+        System.out.print("Nhập mật khẩu cũ: ");
+        String oldPass = sc.nextLine();
+
+        if (!BCrypt.checkpw(oldPass, userLogin.getPassword())) {
+            System.out.println("❌ Mật khẩu cũ không đúng!");
+            return;
+        }
+
+        System.out.print("Nhập mật khẩu mới: ");
+        boolean result = studentService.update(userLogin);
+        String newPass = sc.nextLine();
+
+        String hash = BCrypt.hashpw(newPass, BCrypt.gensalt(10));
+
+        userLogin.setPassword(hash);
+
+        studentService.update(userLogin);
+
+        if (result) {
+            System.out.println("✅ Đổi mật khẩu thành công!");
+        } else {
+            System.out.println("❌ Đổi mật khẩu thất bại!");
+        }
+
+    }
+
 }

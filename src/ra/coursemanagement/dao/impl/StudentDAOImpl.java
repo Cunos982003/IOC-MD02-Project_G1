@@ -99,7 +99,7 @@ public class StudentDAOImpl implements IStudentDAO {
             ps.setString(1, student.getName());
             ps.setDate(2, Date.valueOf(student.getDob()));
             ps.setString(3, student.getEmail());
-            ps.setString(4, student.isSex()?"1":"0");
+            ps.setBoolean(4, student.isSex());
             ps.setString(5, student.getPhone());
             ps.setString(6, student.getPassword());
             ps.setInt(7, student.getId());
