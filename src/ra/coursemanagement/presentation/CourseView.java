@@ -180,6 +180,7 @@ public class CourseView {
             System.out.println("2. Sửa duration");
             System.out.println("3. Sửa instructor");
             System.out.println("0. Quay lại");
+            System.out.print("Chọn: ");
 
             String choice = scanner.nextLine();
 
@@ -301,6 +302,7 @@ public class CourseView {
         System.out.println("2. Tên giảm");
         System.out.println("3. ID tăng");
         System.out.println("4. ID giảm");
+        System.out.print("Chọn: ");
 
         String choice = scanner.nextLine();
 
