@@ -124,7 +124,7 @@ public class Student {
                 (sex ? "Nam" : "Nữ"),
                 phone == null ? "" : phone,
                 createdAt == null ? "" :
-                        createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                        createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         );
     }
 }

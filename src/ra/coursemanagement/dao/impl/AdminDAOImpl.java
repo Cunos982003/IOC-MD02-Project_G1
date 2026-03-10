@@ -1,6 +1,7 @@
 package ra.coursemanagement.dao.impl;
 
 import ra.coursemanagement.dao.IAdminDAO;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Admin;
 import ra.coursemanagement.model.Student;
 import ra.coursemanagement.utils.DBUtil;
@@ -19,23 +20,28 @@ public class AdminDAOImpl implements IAdminDAO {
     }
 
     @Override
-    public void saveAdmin(Admin admin) {
-        String sql = "INSERT INTO ADMIN(username, password)" +
-                " values(?,?)";
+    public boolean saveAdmin(Admin admin) throws MyCheckedException {
+
+        String sql = "INSERT INTO admin(username, password) VALUES(?,?)";
+
         try (
                 Connection conn = DBUtil.getConnection();
-                PreparedStatement pre = conn.prepareStatement(sql);
+                PreparedStatement ps = conn.prepareStatement(sql);
         ) {
-            pre.setString(1, admin.getUsername());
-            pre.setString(2, admin.getPassword());
-            pre.executeUpdate();
+
+            ps.setString(1, admin.getUsername());
+            ps.setString(2, admin.getPassword());
+
+            return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi khi thêm admin", e);
         }
     }
 
     @Override
-    public List<Admin> findAll() {
+    public List<Admin> findAll() throws MyCheckedException {
+
         List<Admin> admins = new ArrayList<>();
         String sql = "SELECT * FROM admin";
 
@@ -44,23 +50,21 @@ public class AdminDAOImpl implements IAdminDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Admin admin = new Admin(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password")
-                );
-                admins.add(admin);
+                admins.add(mapResultSet(rs));
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi lấy danh sách admin", e);
         }
+
         return admins;
     }
 
     @Override
-    public Admin findById(Integer id) {
+    public Admin findById(Integer id) throws MyCheckedException {
+
         String sql = "SELECT * FROM admin WHERE id = ?";
+
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -68,50 +72,26 @@ public class AdminDAOImpl implements IAdminDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return new Admin(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password")
-                );
+                return mapResultSet(rs);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi tìm admin theo ID", e);
         }
+
         return null;
     }
 
     @Override
-    public Admin findByUsername(String username) {
+    public Admin findByUsername(String username) throws MyCheckedException {
+
         String sql = "SELECT * FROM admin WHERE username = ?";
+
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return new Admin(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password")
-                );
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public Admin findByEmail(String email) {
-        String sql = "SELECT * FROM student WHERE email = ?";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -119,14 +99,15 @@ public class AdminDAOImpl implements IAdminDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi tìm admin theo username", e);
         }
 
         return null;
     }
 
     @Override
-    public boolean update(Admin admin) {
+    public boolean update(Admin admin) throws MyCheckedException {
+
         String sql = "UPDATE admin SET username = ?, password = ? WHERE id = ?";
 
         try (Connection conn = DBUtil.getConnection();
@@ -139,51 +120,24 @@ public class AdminDAOImpl implements IAdminDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Lỗi cập nhật admin: " + e.getMessage());
+            throw new MyCheckedException("Lỗi cập nhật admin", e);
         }
-        return false;
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean delete(Integer id) throws MyCheckedException {
+
         String sql = "DELETE FROM admin WHERE id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
+
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Lỗi xóa admin: " + e.getMessage());
+            throw new MyCheckedException("Lỗi xóa admin", e);
         }
-        return false;
-    }
-
-    @Override
-    public Admin login(String username, String password) {
-        String sql = "SELECT * FROM admin WHERE username = ? AND password = ?";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ps.setString(2, password);
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return new Admin(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password")
-                );
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Lỗi login admin: " + e.getMessage());
-        }
-
-        return null;
     }
 }

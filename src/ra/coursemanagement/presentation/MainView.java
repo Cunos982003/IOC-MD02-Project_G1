@@ -1,12 +1,13 @@
 package ra.coursemanagement.presentation;
 
 import org.mindrot.jbcrypt.BCrypt;
+import ra.coursemanagement.exception.MyCheckedException;
 
 import java.util.Scanner;
 
 public class MainView {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MyCheckedException {
 
         Scanner sc = new Scanner(System.in);
         AdminView adminView = new AdminView();

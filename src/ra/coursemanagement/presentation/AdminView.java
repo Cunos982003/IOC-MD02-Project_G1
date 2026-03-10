@@ -2,6 +2,7 @@ package ra.coursemanagement.presentation;
 
 import ra.coursemanagement.business.IAdminService;
 import ra.coursemanagement.business.impl.AdminServiceImpl;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Admin;
 
 import java.util.Scanner;
@@ -10,7 +11,7 @@ public class AdminView {
 
     private static final IAdminService adminService = new AdminServiceImpl();
 
-    public static void showAdminLogin(Scanner sc) {
+    public static void showAdminLogin(Scanner sc) throws MyCheckedException {
 
         while (true) {
             System.out.println("===== ĐĂNG NHẬP QUẢN TRỊ VIÊN =====");
@@ -38,7 +39,7 @@ public class AdminView {
         }
     }
 
-    private static void showAdminMenu(Scanner sc) {
+    private static void showAdminMenu(Scanner sc) throws MyCheckedException {
         while (true) {
             System.out.println("\n=========== MENU ADMIN ===========");
             System.out.println("1. Quản lý khóa học");
@@ -65,6 +66,7 @@ public class AdminView {
                     break;
                 case "4":
                     System.out.println("→ Thống kê học viên theo khóa học");
+                    StatisticView.showStatisticMenu();
                     break;
                 case "5":
                     System.out.println("Đăng xuất...");

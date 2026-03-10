@@ -7,12 +7,12 @@ import ra.coursemanagement.business.IStudentService;
 import ra.coursemanagement.business.impl.CourseServiceImpl;
 import ra.coursemanagement.business.impl.EnrollmentServiceImpl;
 import ra.coursemanagement.business.impl.StudentServiceImpl;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Course;
 import ra.coursemanagement.model.Enrollment;
 import ra.coursemanagement.model.EnrollmentStatus;
 import ra.coursemanagement.model.Student;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -22,12 +22,14 @@ import java.util.Scanner;
 public class StudentView {
 
     public static Student userLogin = null;
-    private static final IStudentService studentService = new StudentServiceImpl();
+    public static final IStudentService studentService = new StudentServiceImpl();
     private static final ICourseService courseService = new CourseServiceImpl();
     private static final IEnrollmentService enrollmentService = new EnrollmentServiceImpl();
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     public static void showMenuLogin(Scanner sc) {
+
         while (true) {
+
             System.out.println("===== ĐĂNG NHẬP HỌC VIÊN =====");
 
             System.out.print("Nhập email: ");
@@ -41,77 +43,24 @@ public class StudentView {
                 continue;
             }
 
-            Student student = studentService.findByEmail(email);
+            try {
 
-            if (student == null) {
-                System.out.println("❌ Email không tồn tại!");
-                continue;
-            }
+                Student student = studentService.login(email, password);
 
-            if (!BCrypt.checkpw(password, student.getPassword())) {
-                System.out.println("❌ Sai mật khẩu!");
-                continue;
-            }
+                if (student == null) {
+                    System.out.println("❌ Email hoặc mật khẩu không đúng!");
+                    continue;
+                }
 
-            System.out.println("✅ Đăng nhập thành công!");
-            userLogin = student;
-            showStudentMenu(sc);
-            break;
-        }
-    }
-
-    public static void showMenuRegister(Scanner sc) {
-
-        System.out.println("===== ĐĂNG KÝ HỌC VIÊN =====");
-
-        System.out.print("Nhập tên sinh viên: ");
-        String name = sc.nextLine().trim();
-
-        System.out.print("Nhập ngày sinh (yyyy-MM-dd): ");
-        LocalDate dob = LocalDate.parse(sc.nextLine());
-
-        System.out.print("Nhập email: ");
-        String email = sc.nextLine().trim();
-
-        if (studentService.findByEmail(email) != null) {
-            System.out.println("❌ Email đã tồn tại!");
-            return;
-        }
-
-        boolean sex;
-        while (true) {
-            System.out.print("Chọn giới tính (1 - Nam / 0 - Nữ): ");
-            String input = sc.nextLine();
-
-            if (input.equals("1")) {
-                sex = true;
+                System.out.println("✅ Đăng nhập thành công!");
+                userLogin = student;
+                showStudentMenu(sc);
                 break;
-            } else if (input.equals("0")) {
-                sex = false;
-                break;
-            } else {
-                System.out.println("❌ Vui lòng nhập 1 hoặc 0!");
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         }
-
-        System.out.print("Nhập Phone: ");
-        String phone = sc.nextLine();
-
-        System.out.print("Nhập mật khẩu: ");
-        String pass = sc.nextLine();
-
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || pass.isEmpty()) {
-            System.out.println("❌ Không được để trống!");
-            return;
-        }
-
-        String hashedPassword = BCrypt.hashpw(pass, BCrypt.gensalt(10));
-
-        Student s = new Student(name, dob, email, sex, phone, hashedPassword);
-
-        studentService.register(s);
-
-        System.out.println("✅ Đăng ký thành công! Vui lòng đăng nhập.");
     }
 
     private static void showStudentMenu(Scanner sc) {
@@ -131,7 +80,7 @@ public class StudentView {
             switch (choice) {
                 case "1":
                     System.out.println("→ Hiển thị danh sách khóa học");
-                    showCourseList();
+                    showCourseList(sc);
                     break;
                 case "2":
                     System.out.println("→ Tìm kiếm khóa học");
@@ -161,24 +110,79 @@ public class StudentView {
             }
         }
     }
-    private static void showCourseList() {
+    private static void showCourseList(Scanner sc) {
 
-        List<Course> list = courseService.findAll();
+        int currentPage = 1;
+        int pageSize = 5;
 
-        if (list.isEmpty()) {
-            System.out.println("Không có khóa học nào!");
-            return;
-        }
+        while (true) {
 
-        System.out.printf("%-5s %-20s %-10s %-20s\n",
-                "ID", "Tên khóa học", "Duration", "Instructor");
+            List<Course> list = courseService.findAllAndPaging(currentPage, pageSize);
 
-        for (Course c : list) {
-            System.out.printf("%-5d %-20s %-10d %-20s\n",
-                    c.getId(),
-                    c.getName(),
-                    c.getDuration(),
-                    c.getInstructor());
+            if (list.isEmpty()) {
+                System.out.println("❌ Không có khóa học nào!");
+                return;
+            }
+
+            System.out.println("\n===== DANH SÁCH KHÓA HỌC =====");
+
+            System.out.printf("| %-5s | %-25s | %-10s | %-20s |\n",
+                    "ID", "Course Name", "Duration", "Instructor");
+
+            for (Course c : list) {
+                System.out.printf("| %-5d | %-25s | %-10d | %-20s |\n",
+                        c.getId(),
+                        c.getName(),
+                        c.getDuration(),
+                        c.getInstructor());
+            }
+
+            int totalCourse = 0;
+            try {
+                totalCourse = courseService.count();
+            } catch (MyCheckedException e) {
+                System.out.println(e.getMessage());
+            }
+            int totalPage = (int) Math.ceil((double) totalCourse / pageSize);
+
+            System.out.println();
+
+            for (int i = 1; i <= totalPage; i++) {
+                if (i == currentPage) {
+                    System.out.print("[" + i + "] ");
+                } else {
+                    System.out.print(i + " ");
+                }
+            }
+
+            System.out.println();
+            System.out.println("1. Previous page");
+            System.out.println("2. Back");
+            System.out.println("3. Next page");
+
+            System.out.print("Enter choice: ");
+            String choice = sc.nextLine();
+
+            switch (choice) {
+
+                case "1":
+                    if (currentPage > 1) {
+                        currentPage--;
+                    }
+                    break;
+
+                case "3":
+                    if (currentPage < totalPage) {
+                        currentPage++;
+                    }
+                    break;
+
+                case "2":
+                    return;
+
+                default:
+                    System.out.println("❌ Lựa chọn không hợp lệ!");
+            }
         }
     }
 
@@ -207,9 +211,7 @@ public class StudentView {
     }
 
     private static void registerCourse(Scanner sc) {
-
-        showCourseList();
-
+        showCourseList(sc);
         System.out.print("Nhập ID khóa học: ");
         int courseId = Integer.parseInt(sc.nextLine());
 
@@ -281,11 +283,12 @@ public class StudentView {
             return;
         }
 
-        System.out.println("Chọn kiểu sắp xếp:");
+        System.out.println("Chọn kiểu sắp xếp");
         System.out.println("1. Tên khóa học tăng dần");
         System.out.println("2. Tên khóa học giảm dần");
         System.out.println("3. Ngày đăng ký tăng dần");
         System.out.println("4. Ngày đăng ký giảm dần");
+        System.out.print("Chọn: ");
 
         String choice = sc.nextLine();
 
@@ -313,18 +316,65 @@ public class StudentView {
                 break;
         }
 
-        System.out.printf("%-5s %-20s %-20s %-10s\n",
-                "ID", "Course", "Registered At", "Status");
+        int pageSize = 5;
+        int currentPage = 1;
+        int total = list.size();
+        int totalPage = (int) Math.ceil((double) total / pageSize);
 
-        for (Enrollment e : list) {
+        while (true) {
 
-            Course c = courseService.findById(e.getCourseId());
+            int start = (currentPage - 1) * pageSize;
+            int end = Math.min(start + pageSize, total);
 
-            System.out.printf("%-5d %-20s %-20s %-10s\n",
-                    c.getId(),
-                    c.getName(),
-                    e.getRegisteredAt().format(formatter),
-                    e.getStatus());
+            List<Enrollment> pageList = list.subList(start, end);
+
+            System.out.printf("\n%-5s %-20s %-20s %-10s\n",
+                    "ID", "Course", "Registered At", "Status");
+
+            for (Enrollment e : pageList) {
+
+                Course c = courseService.findById(e.getCourseId());
+
+                System.out.printf("%-5d %-20s %-20s %-10s\n",
+                        c.getId(),
+                        c.getName(),
+                        e.getRegisteredAt().format(formatter),
+                        e.getStatus());
+            }
+
+            System.out.println("\nTrang: " + currentPage + "/" + totalPage);
+
+            System.out.println("1. Previous");
+            System.out.println("2. Next");
+            System.out.println("0. Thoát");
+            System.out.print("Chọn: ");
+
+            String nav = sc.nextLine();
+
+            switch (nav) {
+
+                case "1":
+                    if (currentPage > 1) {
+                        currentPage--;
+                    } else {
+                        System.out.println("❌ Đang ở trang đầu!");
+                    }
+                    break;
+
+                case "2":
+                    if (currentPage < totalPage) {
+                        currentPage++;
+                    } else {
+                        System.out.println("❌ Đã là trang cuối!");
+                    }
+                    break;
+
+                case "0":
+                    return;
+
+                default:
+                    System.out.println("❌ Không hợp lệ!");
+            }
         }
     }
 

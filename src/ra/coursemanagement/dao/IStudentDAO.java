@@ -1,13 +1,13 @@
 package ra.coursemanagement.dao;
 
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Student;
 
 import java.util.List;
 
 public interface IStudentDAO extends IBaseDAO<Student, Integer> {
-    void saveStudent(Student student);
-    Student findByEmail(String email);
-    Student login(String email, String password);
-    List<Student> searchByName(String keyword);
-    List<Student> sort(String field, String direction);
+    void saveStudent(Student student) throws MyCheckedException;
+    Student findByEmail(String email) throws MyCheckedException;
+    List<Student> findAllAndPaging(int currentPage, int pageSize) throws MyCheckedException;
+    int count() throws MyCheckedException;
 }
