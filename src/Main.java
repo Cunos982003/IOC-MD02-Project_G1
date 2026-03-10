@@ -1,8 +1,9 @@
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.presentation.StudentView;
 
 import java.util.Scanner;
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MyCheckedException {
         Scanner sc = new Scanner(System.in);
         while (true){
             System.out.println("""

@@ -4,6 +4,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import ra.coursemanagement.business.IStudentService;
 import ra.coursemanagement.dao.IStudentDAO;
 import ra.coursemanagement.dao.impl.StudentDAOImpl;
+import ra.coursemanagement.exception.MyCheckedException;
+import ra.coursemanagement.exception.MyUncheckedException;
 import ra.coursemanagement.model.Student;
 
 import java.util.List;
@@ -14,43 +16,109 @@ public class StudentServiceImpl implements IStudentService {
 
     @Override
     public List<Student> findAll() {
-        return studentDao.findAll();
+
+        try {
+            return studentDao.findAll();
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không thể lấy danh sách student: " + e.getMessage());
+        }
     }
 
     @Override
     public Student findById(Integer id) {
-        return studentDao.findById(id);
+
+        try {
+            return studentDao.findById(id);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không tìm thấy student: " + e.getMessage());
+        }
     }
 
     @Override
     public boolean update(Student student) {
-        return studentDao.update(student);
+
+        try {
+            return studentDao.update(student);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Cập nhật student thất bại: " + e.getMessage());
+        }
     }
 
     @Override
     public boolean delete(Integer id) {
-        return studentDao.delete(id);
+
+        try {
+            return studentDao.delete(id);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Xóa student thất bại: " + e.getMessage());
+        }
     }
 
     @Override
     public void register(Student student) {
-        student.setPassword(
-                BCrypt.hashpw(student.getPassword(), BCrypt.gensalt(12))
-        );
-        studentDao.saveStudent(student);
+
+        try {
+            if (studentDao.findByEmail(student.getEmail()) != null) {
+                throw new MyUncheckedException("Email đã tồn tại!");
+            }
+
+            student.setPassword(
+                    BCrypt.hashpw(student.getPassword(), BCrypt.gensalt(12))
+            );
+
+            studentDao.saveStudent(student);
+
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Đăng ký thất bại: " + e.getMessage());
+        }
     }
 
     @Override
     public Student login(String email, String pass) {
-        Student s = studentDao.findByEmail(email);
-        if (s != null && BCrypt.checkpw(pass, s.getPassword())) {
-            return s;
+
+        try {
+
+            Student s = studentDao.findByEmail(email);
+
+            if (s != null && BCrypt.checkpw(pass, s.getPassword())) {
+                return s;
+            }
+
+            return null;
+
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Lỗi đăng nhập: " + e.getMessage());
         }
-        return null;
     }
 
     @Override
     public Student findByEmail(String email) {
-        return studentDao.findByEmail(email);
+
+        try {
+            return studentDao.findByEmail(email);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không tìm thấy email: " + e.getMessage());
+        }
     }
+
+    @Override
+    public List<Student> findAllAndPaging(int currentPage, int pageSize) {
+
+        try {
+            return studentDao.findAllAndPaging(currentPage, pageSize);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Lỗi phân trang student: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public int count() {
+
+        try {
+            return studentDao.count();
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không thể đếm student: " + e.getMessage());
+        }
+    }
+
 }

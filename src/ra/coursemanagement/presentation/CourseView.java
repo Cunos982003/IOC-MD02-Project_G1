@@ -2,6 +2,7 @@ package ra.coursemanagement.presentation;
 
 import ra.coursemanagement.business.ICourseService;
 import ra.coursemanagement.business.impl.CourseServiceImpl;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Course;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,8 @@ import java.util.Scanner;
 public class CourseView {
     private final Scanner scanner = new Scanner(System.in);
     private final ICourseService courseService = new CourseServiceImpl();
+    private int currentPage = 1;
+    private final int pageSize = 5;
 
     public void showCourseMenu() {
         while (true) {
@@ -63,17 +66,76 @@ public class CourseView {
 
     private void showList() {
 
-        List<Course> list = courseService.findAll();
+        while (true) {
 
-        if (list.isEmpty()) {
-            System.out.println("Danh sách khóa học trống!");
-            return;
+            try {
+
+                List<Course> list = courseService.findAllAndPaging(currentPage, pageSize);
+
+                if (list.isEmpty()) {
+                    System.out.println("Danh sách khóa học trống!");
+                    return;
+                }
+
+                printTable(list);
+
+            } catch (MyCheckedException e) {
+                System.out.println("❌ Lỗi: " + e.getMessage());
+                return;
+            }
+
+            System.out.println();
+            System.out.println("1. Previous page");
+            System.out.println("2. Back");
+            System.out.println("3. Next page");
+
+            System.out.print("Enter choice: ");
+
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+
+                case "1":
+                    if (currentPage > 1) {
+                        currentPage--;
+                    } else {
+                        System.out.println("❌ Đang ở trang đầu!");
+                    }
+                    break;
+
+                case "2":
+                    currentPage = 1;
+                    return;
+
+                case "3":
+                    currentPage++;
+                    break;
+
+                default:
+                    System.out.println("❌ Lựa chọn không hợp lệ!");
+            }
         }
-
-        printTable(list);
     }
 
-    private void printTable(List<Course> list) {
+    private void printPageNumber() throws MyCheckedException {
+
+        int total = courseService.count();
+
+        int totalPage = (int) Math.ceil((double) total / pageSize);
+
+        for (int i = 1; i <= totalPage; i++) {
+
+            if (i == currentPage) {
+                System.out.print("[" + i + "] ");
+            } else {
+                System.out.print(i + " ");
+            }
+        }
+
+        System.out.println();
+    }
+
+    private void printTable(List<Course> list) throws MyCheckedException {
 
         System.out.println("\n===== DANH SÁCH KHÓA HỌC =====");
 
@@ -90,6 +152,8 @@ public class CourseView {
                     c.getInstructor(),
                     c.getCreatedAt());
         }
+
+        printPageNumber();
     }
 
     private void addCourse() {
@@ -290,7 +354,11 @@ public class CourseView {
         if (list.isEmpty()) {
             System.out.println("❌ Không tìm thấy khóa học!");
         } else {
-            printTable(list);
+            try {
+                printTable(list);
+            } catch (MyCheckedException e) {
+                System.out.println("❌ Lỗi: " + e.getMessage());
+            }
         }
     }
 
@@ -329,7 +397,11 @@ public class CourseView {
                 return;
         }
 
-        printTable(list);
+        try {
+            printTable(list);
+        } catch (MyCheckedException e) {
+            System.out.println("❌ Lỗi: " + e.getMessage());
+        }
     }
 
 

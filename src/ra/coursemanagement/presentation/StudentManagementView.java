@@ -2,6 +2,7 @@ package ra.coursemanagement.presentation;
 
 import ra.coursemanagement.business.IStudentService;
 import ra.coursemanagement.business.impl.StudentServiceImpl;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Student;
 
 import java.util.Comparator;
@@ -9,10 +10,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class StudentManagementView {
-
+    private static int currentPage = 1;
+    private static final int pageSize = 5;
     private static final IStudentService studentService = new StudentServiceImpl();
 
-    public static void showStudentMenu(Scanner sc) {
+    public static void showStudentMenu(Scanner sc) throws MyCheckedException {
         while (true) {
             System.out.println("\n====== QUẢN LÝ HỌC VIÊN ======");
             System.out.println("1. Hiển thị danh sách");
@@ -28,7 +30,7 @@ public class StudentManagementView {
 
             switch (choice) {
                 case "1":
-                    showList();
+                    showList(sc);
                     break;
                 case "2":
                     addStudent(sc);
@@ -53,9 +55,53 @@ public class StudentManagementView {
         }
     }
 
-    private static void showList() {
-        List<Student> list = studentService.findAll();
-        printStudentTable(list);
+    private static void showList(Scanner sc) {
+
+        while (true) {
+
+            List<Student> list = studentService.findAllAndPaging(currentPage, pageSize);
+
+            if (list.isEmpty()) {
+                System.out.println("Danh sách học viên trống!");
+                return;
+            }
+
+            printStudentTable(list);
+            printPageNumber();
+
+            System.out.println("\n1. Previous page");
+            System.out.println("2. Back");
+            System.out.println("3. Next page");
+
+            System.out.print("Chọn: ");
+            String choice = sc.nextLine();
+
+            switch (choice) {
+
+                case "1":
+                    if (currentPage > 1) {
+                        currentPage--;
+                    } else {
+                        System.out.println("❌ Đang ở trang đầu!");
+                    }
+                    break;
+
+                case "2":
+                    currentPage = 1;
+                    return;
+
+                case "3":
+                    if (list.size() == pageSize) {
+                        currentPage++;
+                    } else {
+                        System.out.println("❌ Đã là trang cuối!");
+                    }
+                    break;
+
+                default:
+                    System.out.println("❌ Không hợp lệ!");
+            }
+        }
     }
 
     private static void printStudentTable(List<Student> list) {
@@ -73,6 +119,7 @@ public class StudentManagementView {
         System.out.println("--------------------------------------------------------------------------");
 
         for (Student s : list) {
+
             System.out.printf("%-5d %-20s %-12s %-25s %-6s %-15s\n",
                     s.getId(),
                     s.getName(),
@@ -83,7 +130,33 @@ public class StudentManagementView {
         }
     }
 
-    private static void addStudent(Scanner sc) {
+    private static void printPageNumber() {
+
+        try {
+
+            int total = studentService.count();
+
+            int totalPage = (int) Math.ceil((double) total / pageSize);
+
+            System.out.print("\nTrang: ");
+
+            for (int i = 1; i <= totalPage; i++) {
+
+                if (i == currentPage) {
+                    System.out.print("[" + i + "] ");
+                } else {
+                    System.out.print(i + " ");
+                }
+            }
+
+            System.out.println();
+
+        } catch (MyCheckedException e) {
+            System.out.println("❌ Lỗi paging: " + e.getMessage());
+        }
+    }
+
+    private static void addStudent(Scanner sc) throws MyCheckedException {
         System.out.println("\n===== THÊM HỌC VIÊN =====");
 
         Student s = new Student();

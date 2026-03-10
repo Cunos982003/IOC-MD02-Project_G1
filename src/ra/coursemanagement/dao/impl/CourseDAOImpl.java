@@ -1,6 +1,7 @@
 package ra.coursemanagement.dao.impl;
 
 import ra.coursemanagement.dao.ICourseDAO;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Course;
 import ra.coursemanagement.utils.DBUtil;
 
@@ -21,7 +22,7 @@ public class CourseDAOImpl implements ICourseDAO {
     }
 
     @Override
-    public List<Course> findAll() {
+    public List<Course> findAll() throws MyCheckedException {
 
         List<Course> list = new ArrayList<>();
 
@@ -38,14 +39,50 @@ public class CourseDAOImpl implements ICourseDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi khi lưu enrollment", e);
         }
 
         return list;
     }
 
     @Override
-    public Course findById(Integer id) {
+    public List<Course> findAllAndPaging(int currentPage, int pageSize) throws MyCheckedException {
+
+        List<Course> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM course ORDER BY id LIMIT ? OFFSET ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            int offset = (currentPage - 1) * pageSize;
+
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Course c = new Course();
+
+                c.setId(rs.getInt("id"));
+                c.setName(rs.getString("name"));
+                c.setDuration(rs.getInt("duration"));
+                c.setInstructor(rs.getString("instructor"));
+
+                list.add(c);
+            }
+
+        } catch (Exception e) {
+            throw new MyCheckedException("Lỗi paging course", e);
+        }
+
+        return list;
+    }
+
+    @Override
+    public Course findById(Integer id) throws MyCheckedException {
 
         String sql = "SELECT * FROM course WHERE id = ?";
 
@@ -63,19 +100,19 @@ public class CourseDAOImpl implements ICourseDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi khi tìm ID Course", e);
         }
 
         return null;
     }
 
     @Override
-    public boolean save(Course course) {
+    public boolean saveCourse(Course course) throws MyCheckedException {
 
         String sql = """
-                INSERT INTO course(name, duration, instructor)
-                VALUES(?,?,?)
-                """;
+            INSERT INTO course(name, duration, instructor)
+            VALUES(?,?,?)
+            """;
 
         try (
                 Connection conn = DBUtil.getConnection();
@@ -89,20 +126,18 @@ public class CourseDAOImpl implements ICourseDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.out.println("Lỗi thêm course: " + e.getMessage());
+            throw new MyCheckedException("Lỗi thêm course", e);
         }
-
-        return false;
     }
 
     @Override
-    public boolean update(Course course) {
+    public boolean update(Course course) throws MyCheckedException {
 
         String sql = """
-                UPDATE course
-                SET name=?, duration=?, instructor=?
-                WHERE id=?
-                """;
+            UPDATE course
+            SET name=?, duration=?, instructor=?
+            WHERE id=?
+            """;
 
         try (
                 Connection conn = DBUtil.getConnection();
@@ -117,14 +152,12 @@ public class CourseDAOImpl implements ICourseDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.out.println("Lỗi update course: " + e.getMessage());
+            throw new MyCheckedException("Lỗi update course", e);
         }
-
-        return false;
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean delete(Integer id) throws MyCheckedException {
 
         String sql = "DELETE FROM course WHERE id = ?";
 
@@ -138,14 +171,12 @@ public class CourseDAOImpl implements ICourseDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.out.println("Lỗi xóa course: " + e.getMessage());
+            throw new MyCheckedException("Lỗi xóa course", e);
         }
-
-        return false;
     }
 
     @Override
-    public Course findByName(String name) {
+    public Course findByName(String name) throws MyCheckedException {
 
         String sql = "SELECT * FROM course WHERE name = ?";
 
@@ -163,9 +194,29 @@ public class CourseDAOImpl implements ICourseDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi tìm course theo name", e);
         }
 
         return null;
+    }
+
+    @Override
+    public int count() throws MyCheckedException {
+
+        String sql = "SELECT COUNT(*) FROM course";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            throw new MyCheckedException("Lỗi count course", e);
+        }
+
+        return 0;
     }
 }

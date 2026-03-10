@@ -1,6 +1,7 @@
 package ra.coursemanagement.dao.impl;
 
 import ra.coursemanagement.dao.IStudentDAO;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Student;
 import ra.coursemanagement.utils.DBUtil;
 
@@ -152,74 +153,58 @@ public class StudentDAOImpl implements IStudentDAO {
     }
 
     @Override
-    public Student login(String email, String password) {
-        String sql = "SELECT * FROM student WHERE email = ? AND password = ?";
+    public int count() throws MyCheckedException {
+
+        String sql = "SELECT COUNT(*) FROM student";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, email);
-            ps.setString(2, password);
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapResultSet(rs);
+                return rs.getInt(1);
             }
 
-        } catch (SQLException e) {
-            System.out.println("Lỗi login student: " + e.getMessage());
+        } catch (Exception e) {
+            throw new MyCheckedException("Lỗi đếm student", e);
         }
 
-        return null;
+        return 0;
     }
 
     @Override
-    public List<Student> searchByName(String keyword) {
+    public List<Student> findAllAndPaging(int currentPage, int pageSize) {
+
         List<Student> list = new ArrayList<>();
-        String sql = "SELECT * FROM student WHERE name ILIKE ?";
+
+        String sql = "SELECT * FROM student ORDER BY id LIMIT ? OFFSET ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "%" + keyword + "%");
+            int offset = (currentPage - 1) * pageSize;
+
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                list.add(mapResultSet(rs));
+
+                Student s = new Student();
+
+                s.setId(rs.getInt("id"));
+                s.setName(rs.getString("name"));
+                s.setDob(rs.getDate("dob").toLocalDate());
+                s.setEmail(rs.getString("email"));
+                s.setSex(rs.getBoolean("sex"));
+                s.setPhone(rs.getString("phone"));
+
+                list.add(s);
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    @Override
-    public List<Student> sort(String field, String direction) {
-
-        List<Student> list = new ArrayList<>();
-
-        String sql = "SELECT * FROM student ORDER BY " + field + " " + direction;
-        if (!field.equals("name") && !field.equals("id")) {
-            field = "id";
-        }
-
-        if (!direction.equalsIgnoreCase("ASC") &&
-                !direction.equalsIgnoreCase("DESC")) {
-            direction = "ASC";
-        }
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                list.add(mapResultSet(rs));
-            }
-
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

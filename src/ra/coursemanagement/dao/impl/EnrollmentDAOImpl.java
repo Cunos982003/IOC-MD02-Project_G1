@@ -1,6 +1,7 @@
 package ra.coursemanagement.dao.impl;
 
 import ra.coursemanagement.dao.IEnrollmentDAO;
+import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Enrollment;
 import ra.coursemanagement.model.EnrollmentStatus;
 import ra.coursemanagement.utils.DBUtil;
@@ -10,149 +11,131 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnrollmentDAOImpl implements IEnrollmentDAO {
+    private Enrollment mapResultSet(ResultSet rs) throws SQLException {
+
+        Enrollment e = new Enrollment();
+
+        e.setId(rs.getInt("id"));
+        e.setStudentId(rs.getInt("student_id"));
+        e.setCourseId(rs.getInt("course_id"));
+        e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
+        e.setStatus(EnrollmentStatus.valueOf(rs.getString("status")));
+
+        return e;
+    }
 
     @Override
-    public List<Enrollment> findAll() {
+    public List<Enrollment> findAll() throws MyCheckedException {
 
         List<Enrollment> list = new ArrayList<>();
 
         String sql = "SELECT * FROM enrollment";
 
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()){
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-            while(rs.next()){
-
-                Enrollment e = new Enrollment();
-
-                e.setId(rs.getInt("id"));
-                e.setStudentId(rs.getInt("student_id"));
-                e.setCourseId(rs.getInt("course_id"));
-                e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
-                e.setStatus(EnrollmentStatus.valueOf(rs.getString("status")));
-
-                list.add(e);
+            while (rs.next()) {
+                list.add(mapResultSet(rs));
             }
 
-        }catch(Exception e){
-            System.out.println("Lỗi findAll enrollment: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi lấy danh sách enrollment", e);
         }
 
         return list;
     }
 
     @Override
-    public Enrollment findById(Integer id) {
+    public Enrollment findById(Integer id) throws MyCheckedException {
 
         String sql = "SELECT * FROM enrollment WHERE id=?";
 
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1,id);
+            ps.setInt(1, id);
 
             ResultSet rs = ps.executeQuery();
 
-            if(rs.next()){
-
-                Enrollment e = new Enrollment();
-
-                e.setId(rs.getInt("id"));
-                e.setStudentId(rs.getInt("student_id"));
-                e.setCourseId(rs.getInt("course_id"));
-                e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
-                e.setStatus(EnrollmentStatus.valueOf(rs.getString("status")));
-
-                return e;
+            if (rs.next()) {
+                return mapResultSet(rs);
             }
 
-        }catch(Exception e){
-            System.out.println("Lỗi findById enrollment: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi tìm enrollment theo ID", e);
         }
 
         return null;
     }
 
     @Override
-    public boolean update(Enrollment e) {
+    public boolean update(Enrollment e) throws MyCheckedException {
+
+        String sql = "UPDATE enrollment SET status=?::enrollment_status WHERE id=?";
 
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps =
-                     conn.prepareStatement(
-                             "UPDATE enrollment SET status=?::enrollment_status WHERE id=?")) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, e.getStatus().name());
             ps.setInt(2, e.getId());
 
             return ps.executeUpdate() > 0;
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (SQLException ex) {
+            throw new MyCheckedException("Lỗi cập nhật enrollment", ex);
         }
-
-        return false;
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean delete(Integer id) throws MyCheckedException {
 
         String sql = "DELETE FROM enrollment WHERE id=?";
 
-        try(Connection conn = DBUtil.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1,id);
+            ps.setInt(1, id);
 
-            return ps.executeUpdate()>0;
+            return ps.executeUpdate() > 0;
 
-        }catch(Exception e){
-            System.out.println("Lỗi delete enrollment: "+e.getMessage());
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi xóa enrollment", e);
         }
-
-        return false;
     }
 
     @Override
-    public List<Enrollment> findByStudentId(int studentId) {
+    public List<Enrollment> findByStudentId(int studentId) throws MyCheckedException {
 
         List<Enrollment> list = new ArrayList<>();
 
+        String sql = "SELECT * FROM enrollment WHERE student_id = ?";
+
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                     "SELECT * FROM enrollment WHERE student_id = ?")) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, studentId);
 
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-
-                Enrollment e = new Enrollment();
-
-                e.setId(rs.getInt("id"));
-                e.setStudentId(rs.getInt("student_id"));
-                e.setCourseId(rs.getInt("course_id"));
-                e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
-                e.setStatus(EnrollmentStatus.valueOf(rs.getString("status")));
-
-                list.add(e);
+                list.add(mapResultSet(rs));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi tìm enrollment theo student", e);
         }
 
         return list;
     }
 
     @Override
-    public boolean existsEnrollment(int studentId, int courseId) {
+    public boolean existsEnrollment(int studentId, int courseId) throws MyCheckedException {
+
+        String sql = "SELECT 1 FROM enrollment WHERE student_id=? AND course_id=?";
 
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps =
-                     conn.prepareStatement(
-                             "SELECT 1 FROM enrollment WHERE student_id = ? AND course_id = ?")) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, studentId);
             ps.setInt(2, courseId);
@@ -161,20 +144,21 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
 
             return rs.next();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi kiểm tra enrollment", e);
         }
-
-        return false;
     }
 
     @Override
-    public void save(Enrollment e) {
+    public void save(Enrollment e) throws MyCheckedException {
+
+        String sql = """
+            INSERT INTO enrollment(student_id, course_id, registered_at, status)
+            VALUES (?,?,?,?::enrollment_status)
+            """;
 
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps =
-                     conn.prepareStatement(
-                             "INSERT INTO enrollment(student_id, course_id, registered_at, status) VALUES (?,?,?,?::enrollment_status)")) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, e.getStudentId());
             ps.setInt(2, e.getCourseId());
@@ -183,8 +167,64 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
 
             ps.executeUpdate();
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (SQLException ex) {
+            throw new MyCheckedException("Lỗi đăng ký khóa học", ex);
         }
+    }
+    @Override
+    public List<Enrollment> findAllAndPaging(int currentPage, int pageSize)
+            throws MyCheckedException {
+
+        List<Enrollment> list = new ArrayList<>();
+
+        String sql = """
+                SELECT * FROM enrollment
+                ORDER BY id
+                LIMIT ? OFFSET ?
+                """;
+
+        int offset = (currentPage - 1) * pageSize;
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapResultSet(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi paging enrollment", e);
+        }
+
+        return list;
+    }
+    @Override
+    public List<Enrollment> findByCourseId(int courseId) throws MyCheckedException {
+
+        List<Enrollment> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM enrollment WHERE course_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, courseId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapResultSet(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi lấy enrollment theo course", e);
+        }
+
+        return list;
     }
 }

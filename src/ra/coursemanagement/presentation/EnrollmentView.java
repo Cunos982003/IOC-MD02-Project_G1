@@ -1,33 +1,201 @@
 package ra.coursemanagement.presentation;
 
+import ra.coursemanagement.business.IEnrollmentService;
+import ra.coursemanagement.business.ICourseService;
+import ra.coursemanagement.business.IStudentService;
+import ra.coursemanagement.business.impl.EnrollmentServiceImpl;
+import ra.coursemanagement.business.impl.CourseServiceImpl;
+import ra.coursemanagement.business.impl.StudentServiceImpl;
+import ra.coursemanagement.exception.MyUncheckedException;
+import ra.coursemanagement.model.*;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Scanner;
 
 public class EnrollmentView {
-    private static final Scanner scanner = new Scanner(System.in);
+
+    private static final Scanner sc = new Scanner(System.in);
+
+    private static final IEnrollmentService enrollmentService =
+            new EnrollmentServiceImpl();
+
+    private static final ICourseService courseService =
+            new CourseServiceImpl();
+
+    private static final IStudentService studentService =
+            new StudentServiceImpl();
+
+    private static final int PAGE_SIZE = 5;
 
     public static void showEnrollmentMenu() {
-        while (true) {
-            System.out.println("\n===== QUẢN LÝ ĐĂNG KÝ =====");
-            System.out.println("1. Hiển thị học viên theo khóa");
-            System.out.println("2. Thêm đăng ký");
-            System.out.println("3. Xóa đăng ký");
-            System.out.println("4. Quay lại");
-            System.out.print("Chọn: ");
 
-            String choice = scanner.nextLine();
+        while (true) {
+
+            System.out.println("\n===== QUẢN LÝ ĐĂNG KÝ KHÓA HỌC =====");
+            System.out.println("1. Hiển thị sinh viên theo khóa học");
+            System.out.println("2. Duyệt đăng ký");
+            System.out.println("3. Xóa đăng ký");
+            System.out.println("0. Quay lại");
+
+            System.out.print("Chọn: ");
+            String choice = sc.nextLine();
 
             switch (choice) {
+
                 case "1":
+                    showStudentByCourse();
                     break;
+
                 case "2":
+                    approveEnrollment();
                     break;
+
                 case "3":
+                    deleteEnrollment(sc);
                     break;
-                case "4":
+
+                case "0":
                     return;
+
                 default:
-                    System.out.println("Lựa chọn không hợp lệ!");
+                    System.out.println("❌ Không hợp lệ!");
             }
+        }
+    }
+
+    private static void showStudentByCourse() {
+
+        System.out.print("Nhập ID khóa học: ");
+        int courseId = Integer.parseInt(sc.nextLine());
+
+        List<Enrollment> list = enrollmentService.findByCourseId(courseId);
+
+        if (list.isEmpty()) {
+            System.out.println("❌ Không có sinh viên đăng ký!");
+            return;
+        }
+
+        int currentPage = 1;
+        int total = list.size();
+        int totalPage = (int) Math.ceil((double) total / PAGE_SIZE);
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        while (true) {
+
+            int start = (currentPage - 1) * PAGE_SIZE;
+            int end = Math.min(start + PAGE_SIZE, total);
+
+            List<Enrollment> pageList = list.subList(start, end);
+
+            System.out.printf("\n%-5s %-20s %-20s %-12s\n",
+                    "ID", "Student", "Registered", "Status");
+
+            for (Enrollment e : pageList) {
+
+                Student s = studentService.findById(e.getStudentId());
+
+                System.out.printf("%-5d %-20s %-20s %-12s\n",
+                        e.getId(),
+                        s.getName(),
+                        e.getRegisteredAt().format(formatter),
+                        e.getStatus());
+            }
+
+            System.out.println("\nTrang: " + currentPage + "/" + totalPage);
+            System.out.println("1. Previous");
+            System.out.println("2. Next");
+            System.out.println("0. Thoát");
+
+            String nav = sc.nextLine();
+
+            switch (nav) {
+
+                case "1":
+                    if (currentPage > 1) currentPage--;
+                    else System.out.println("❌ Trang đầu!");
+                    break;
+
+                case "2":
+                    if (currentPage < totalPage) currentPage++;
+                    else System.out.println("❌ Trang cuối!");
+                    break;
+
+                case "0":
+                    return;
+            }
+        }
+    }
+
+    private static void approveEnrollment() {
+
+        System.out.print("Nhập ID enrollment: ");
+        int id = Integer.parseInt(sc.nextLine());
+
+        Enrollment e = enrollmentService.findById(id);
+
+        if (e == null) {
+            System.out.println("❌ Không tồn tại!");
+            return;
+        }
+
+        System.out.println("1. Confirm");
+        System.out.println("2. Denied");
+
+        String choice = sc.nextLine();
+
+        switch (choice) {
+
+            case "1":
+                e.setStatus(EnrollmentStatus.CONFIRM);
+                break;
+
+            case "2":
+                e.setStatus(EnrollmentStatus.DENIED);
+                break;
+
+            default:
+                System.out.println("❌ Không hợp lệ!");
+                return;
+        }
+
+        try {
+
+            if (enrollmentService.update(e)) {
+                System.out.println("✅ Cập nhật thành công!");
+            } else {
+                System.out.println("❌ Thất bại!");
+            }
+
+        } catch (MyUncheckedException ex) {
+
+            System.out.println("❌ " + ex.getMessage());
+        }
+    }
+
+    private static void deleteEnrollment(Scanner sc) {
+
+        System.out.print("Nhập ID enrollment: ");
+        int id = Integer.parseInt(sc.nextLine());
+
+        System.out.print("Bạn chắc chắn xóa? (y/n): ");
+
+        if (sc.nextLine().equalsIgnoreCase("y")) {
+
+            try {
+
+                if (enrollmentService.delete(id)) {
+                    System.out.println("✅ Đã xóa!");
+                } else {
+                    System.out.println("❌ Xóa thất bại!");
+                }
+
+            } catch (MyUncheckedException e) {
+                System.out.println("❌ " + e.getMessage());
+            }
+
         }
     }
 }
