@@ -3,9 +3,9 @@ package ra.coursemanagement.presentation;
 import java.util.Scanner;
 
 public class EnrollmentView {
-    private final Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
-    public void showEnrollmentMenu() {
+    public static void showEnrollmentMenu() {
         while (true) {
             System.out.println("\n===== QUẢN LÝ ĐĂNG KÝ =====");
             System.out.println("1. Hiển thị học viên theo khóa");

@@ -61,6 +61,7 @@ public class AdminView {
                     break;
                 case "3":
                     System.out.println("→ Quản lý đăng ký học");
+                    EnrollmentView.showEnrollmentMenu();
                     break;
                 case "4":
                     System.out.println("→ Thống kê học viên theo khóa học");
