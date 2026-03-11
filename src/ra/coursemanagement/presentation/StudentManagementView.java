@@ -188,6 +188,7 @@ public class StudentManagementView {
             System.out.println("\n1. Sửa tên");
             System.out.println("2. Sửa email");
             System.out.println("3. Sửa SĐT");
+            System.out.println("4. Sửa giới tính");
             System.out.println("0. Quay lại");
 
             String choice = sc.nextLine();
@@ -195,18 +196,71 @@ public class StudentManagementView {
             switch (choice) {
 
                 case "1":
-                    System.out.print("Tên mới: ");
-                    s.setName(sc.nextLine());
+                    while (true) {
+                        System.out.print("Tên mới: ");
+                        String name = sc.nextLine().trim();
+
+                        if (name.isEmpty()) {
+                            System.out.println("❌ Tên không được để trống!");
+                        } else if (name.length() < 3) {
+                            System.out.println("❌ Tên phải ít nhất 3 ký tự!");
+                        } else {
+                            s.setName(name);
+                            break;
+                        }
+                    }
                     break;
 
                 case "2":
-                    System.out.print("Email mới: ");
-                    s.setEmail(sc.nextLine());
+                    while (true) {
+                        System.out.print("Email mới: ");
+                        String email = sc.nextLine().trim();
+
+                        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+
+                        if (email.isEmpty()) {
+                            System.out.println("❌ Email không được để trống!");
+                        } else if (!email.matches(emailRegex)) {
+                            System.out.println("❌ Email không đúng định dạng!");
+                        } else {
+                            s.setEmail(email);
+                            break;
+                        }
+                    }
                     break;
 
                 case "3":
-                    System.out.print("SĐT mới: ");
-                    s.setPhone(sc.nextLine());
+                    while (true) {
+                        System.out.print("SĐT mới: ");
+                        String phone = sc.nextLine().trim();
+
+                        String phoneRegex = "^0\\d{9}$";
+
+                        if (phone.isEmpty()) {
+                            System.out.println("❌ SĐT không được để trống!");
+                        } else if (!phone.matches(phoneRegex)) {
+                            System.out.println("❌ SĐT phải 10 số và bắt đầu bằng 0!");
+                        } else {
+                            s.setPhone(phone);
+                            break;
+                        }
+                    }
+                    break;
+                case "4":
+                    while (true) {
+                        System.out.print("Giới tính (Nam - 1 / Nữ - 0): ");
+                        String input = sc.nextLine().trim();
+
+                        if (input.equals("1")) {
+                            s.setSex(true);
+                            break;
+                        } else if (input.equals("0")) {
+                            s.setSex(false);
+                            break;
+                        } else {
+                            System.out.println("❌ Chỉ nhập 1 hoặc 0!");
+                        }
+                    }
                     break;
 
                 case "0":
