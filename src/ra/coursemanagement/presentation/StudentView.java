@@ -43,6 +43,16 @@ public class StudentView {
                 continue;
             }
 
+            if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                System.out.println("❌ Email không đúng định dạng!");
+                continue;
+            }
+
+            if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$")) {
+                System.out.println("❌ Mật khẩu phải ≥6 ký tự và chứa chữ + số!");
+                continue;
+            }
+
             try {
 
                 Student student = studentService.login(email, password);
