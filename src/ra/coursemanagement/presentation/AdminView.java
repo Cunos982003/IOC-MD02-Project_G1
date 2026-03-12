@@ -23,16 +23,16 @@ public class AdminView {
             String password = sc.nextLine().trim();
 
             if (username.isEmpty() || password.isEmpty()) {
-                System.out.println("❌ Không được để trống!");
+                System.out.println(" Không được để trống!");
                 continue;
             }
 
             Admin admin = adminService.login(username, password);
 
             if (admin == null) {
-                System.out.println("❌ Sai email hoặc mật khẩu!");
+                System.out.println(" Sai email hoặc mật khẩu!");
             } else {
-                System.out.println("✅ Đăng nhập thành công!");
+                System.out.println(" Đăng nhập thành công!");
                 showAdminMenu(sc);
                 break;
             }
@@ -72,7 +72,7 @@ public class AdminView {
                     System.out.println("Đăng xuất...");
                     return;
                 default:
-                    System.out.println("❌ Lựa chọn không hợp lệ!");
+                    System.out.println(" Lựa chọn không hợp lệ!");
             }
         }
     }

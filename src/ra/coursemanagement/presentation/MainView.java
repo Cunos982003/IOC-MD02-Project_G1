@@ -35,7 +35,7 @@ public class MainView {
                     System.exit(0);
                     break;
                 default:
-                    System.out.println("❌ Lựa chọn không hợp lệ!\n");
+                    System.out.println(" Lựa chọn không hợp lệ!\n");
             }
         }
     }

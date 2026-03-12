@@ -258,7 +258,7 @@ public class CourseView {
                         String name = scanner.nextLine().trim();
 
                         if (name.isEmpty()) {
-                            System.out.println("❌ Không được để trống!");
+                            System.out.println(" Không được để trống!");
                         } else {
                             c.setName(name);
                             break;
@@ -273,14 +273,14 @@ public class CourseView {
                             int duration = Integer.parseInt(scanner.nextLine());
 
                             if (duration <= 0) {
-                                System.out.println("❌ Duration phải > 0!");
+                                System.out.println(" Duration phải > 0!");
                             } else {
                                 c.setDuration(duration);
                                 break;
                             }
 
                         } catch (NumberFormatException e) {
-                            System.out.println("❌ Phải nhập số!");
+                            System.out.println(" Phải nhập số!");
                         }
                     }
                     break;
@@ -291,7 +291,7 @@ public class CourseView {
                         String ins = scanner.nextLine().trim();
 
                         if (ins.isEmpty()) {
-                            System.out.println("❌ Không được để trống!");
+                            System.out.println(" Không được để trống!");
                         } else {
                             c.setInstructor(ins);
                             break;
@@ -303,12 +303,12 @@ public class CourseView {
                     return;
 
                 default:
-                    System.out.println("❌ Không hợp lệ!");
+                    System.out.println(" Không hợp lệ!");
                     continue;
             }
 
             courseService.update(c);
-            System.out.println("✅ Cập nhật thành công!");
+            System.out.println(" Cập nhật thành công!");
         }
     }
 
@@ -320,14 +320,14 @@ public class CourseView {
             System.out.print("Nhập ID cần xóa: ");
             id = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            System.out.println("❌ ID phải là số!");
+            System.out.println(" ID phải là số!");
             return;
         }
 
         Course c = courseService.findById(id);
 
         if (c == null) {
-            System.out.println("❌ Không tồn tại!");
+            System.out.println(" Không tồn tại!");
             return;
         }
 
@@ -337,7 +337,7 @@ public class CourseView {
 
             courseService.delete(id);
 
-            System.out.println("✅ Đã xóa!");
+            System.out.println(" Đã xóa!");
         }
     }
 
@@ -347,19 +347,19 @@ public class CourseView {
         String keyword = scanner.nextLine().trim();
 
         if (keyword.isEmpty()) {
-            System.out.println("❌ Không được để trống!");
+            System.out.println(" Không được để trống!");
             return;
         }
 
         List<Course> list = courseService.searchByName(keyword);
 
         if (list.isEmpty()) {
-            System.out.println("❌ Không tìm thấy khóa học!");
+            System.out.println(" Không tìm thấy khóa học!");
         } else {
             try {
                 printTable(list);
             } catch (MyCheckedException e) {
-                System.out.println("❌ Lỗi: " + e.getMessage());
+                System.out.println(" Lỗi: " + e.getMessage());
             }
         }
     }
@@ -402,7 +402,7 @@ public class CourseView {
         try {
             printTable(list);
         } catch (MyCheckedException e) {
-            System.out.println("❌ Lỗi: " + e.getMessage());
+            System.out.println(" Lỗi: " + e.getMessage());
         }
     }
 

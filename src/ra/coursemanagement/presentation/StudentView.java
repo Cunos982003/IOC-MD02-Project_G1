@@ -39,7 +39,7 @@ public class StudentView {
             String password = sc.nextLine().trim();
 
             if (email.isEmpty() || password.isEmpty()) {
-                System.out.println("❌ Không được để trống!");
+                System.out.println(" Không được để trống!");
                 continue;
             }
 
@@ -48,11 +48,11 @@ public class StudentView {
                 Student student = studentService.login(email, password);
 
                 if (student == null) {
-                    System.out.println("❌ Email hoặc mật khẩu không đúng!");
+                    System.out.println(" Email hoặc mật khẩu không đúng!");
                     continue;
                 }
 
-                System.out.println("✅ Đăng nhập thành công!");
+                System.out.println(" Đăng nhập thành công!");
                 userLogin = student;
                 showStudentMenu(sc);
                 break;
@@ -106,7 +106,7 @@ public class StudentView {
                     userLogin = null;
                     return;
                 default:
-                    System.out.println("❌ Lựa chọn không hợp lệ!");
+                    System.out.println(" Lựa chọn không hợp lệ!");
             }
         }
     }
@@ -120,7 +120,7 @@ public class StudentView {
             List<Course> list = courseService.findAllAndPaging(currentPage, pageSize);
 
             if (list.isEmpty()) {
-                System.out.println("❌ Không có khóa học nào!");
+                System.out.println(" Không có khóa học nào!");
                 return;
             }
 
@@ -181,7 +181,7 @@ public class StudentView {
                     return;
 
                 default:
-                    System.out.println("❌ Lựa chọn không hợp lệ!");
+                    System.out.println(" Lựa chọn không hợp lệ!");
             }
         }
     }
@@ -194,7 +194,7 @@ public class StudentView {
         List<Course> list = courseService.searchByName(keyword);
 
         if (list.isEmpty()) {
-            System.out.println("❌ Không tìm thấy!");
+            System.out.println(" Không tìm thấy!");
             return;
         }
 
@@ -216,7 +216,7 @@ public class StudentView {
         int courseId = Integer.parseInt(sc.nextLine());
 
         if (enrollmentService.existsEnrollment(userLogin.getId(), courseId)) {
-            System.out.println("❌ Bạn đã đăng ký khóa học này!");
+            System.out.println(" Bạn đã đăng ký khóa học này!");
             return;
         }
 
@@ -229,7 +229,7 @@ public class StudentView {
 
         enrollmentService.register(e);
 
-        System.out.println("✅ Đăng ký thành công! (Chờ duyệt)");
+        System.out.println(" Đăng ký thành công! (Chờ duyệt)");
     }
 
     private static void changePassword(Scanner sc) {
@@ -240,7 +240,7 @@ public class StudentView {
         if (!verify.equals(userLogin.getEmail()) &&
                 !verify.equals(userLogin.getPhone())) {
 
-            System.out.println("❌ Xác thực thất bại!");
+            System.out.println(" Xác thực thất bại!");
             return;
         }
 
@@ -248,7 +248,7 @@ public class StudentView {
         String oldPass = sc.nextLine();
 
         if (!BCrypt.checkpw(oldPass, userLogin.getPassword())) {
-            System.out.println("❌ Mật khẩu cũ không đúng!");
+            System.out.println(" Mật khẩu cũ không đúng!");
             return;
         }
 
@@ -256,7 +256,7 @@ public class StudentView {
         String newPass = sc.nextLine();
 
         if (newPass.length() < 6) {
-            System.out.println("❌ Mật khẩu phải ≥ 6 ký tự!");
+            System.out.println(" Mật khẩu phải ≥ 6 ký tự!");
             return;
         }
 
@@ -267,9 +267,9 @@ public class StudentView {
         boolean result = studentService.update(userLogin);
 
         if (result) {
-            System.out.println("✅ Đổi mật khẩu thành công!");
+            System.out.println(" Đổi mật khẩu thành công!");
         } else {
-            System.out.println("❌ Đổi mật khẩu thất bại!");
+            System.out.println(" Đổi mật khẩu thất bại!");
         }
     }
 
@@ -279,7 +279,7 @@ public class StudentView {
                 enrollmentService.findByStudentId(userLogin.getId());
 
         if (list.isEmpty()) {
-            System.out.println("❌ Bạn chưa đăng ký khóa học nào!");
+            System.out.println(" Bạn chưa đăng ký khóa học nào!");
             return;
         }
 
@@ -357,7 +357,7 @@ public class StudentView {
                     if (currentPage > 1) {
                         currentPage--;
                     } else {
-                        System.out.println("❌ Đang ở trang đầu!");
+                        System.out.println(" Đang ở trang đầu!");
                     }
                     break;
 
@@ -365,7 +365,7 @@ public class StudentView {
                     if (currentPage < totalPage) {
                         currentPage++;
                     } else {
-                        System.out.println("❌ Đã là trang cuối!");
+                        System.out.println(" Đã là trang cuối!");
                     }
                     break;
 
@@ -373,7 +373,7 @@ public class StudentView {
                     return;
 
                 default:
-                    System.out.println("❌ Không hợp lệ!");
+                    System.out.println(" Không hợp lệ!");
             }
         }
     }
@@ -384,7 +384,7 @@ public class StudentView {
                 enrollmentService.findByStudentId(userLogin.getId());
 
         if (list.isEmpty()) {
-            System.out.println("❌ Bạn chưa đăng ký khóa học nào!");
+            System.out.println(" Bạn chưa đăng ký khóa học nào!");
             return;
         }
 
@@ -396,16 +396,16 @@ public class StudentView {
             if (e.getCourseId() == courseId) {
 
                 if (e.getStatus() != EnrollmentStatus.WAITING) {
-                    System.out.println("❌ Không thể hủy vì khóa học đã được xác nhận!");
+                    System.out.println(" Không thể hủy vì khóa học đã được xác nhận!");
                     return;
                 }
 
                 e.setStatus(EnrollmentStatus.CANCEL);
 
                 if (enrollmentService.update(e)) {
-                    System.out.println("✅ Hủy đăng ký thành công!");
+                    System.out.println(" Hủy đăng ký thành công!");
                 } else {
-                    System.out.println("❌ Hủy thất bại!");
+                    System.out.println(" Hủy thất bại!");
                 }
 
                 return;
