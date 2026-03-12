@@ -59,7 +59,7 @@ public class EnrollmentView {
                     return;
 
                 default:
-                    System.out.println("❌ Không hợp lệ!");
+                    System.out.println(" Không hợp lệ!");
             }
         }
     }
@@ -72,7 +72,7 @@ public class EnrollmentView {
         List<Enrollment> list = enrollmentService.findByCourseId(courseId);
 
         if (list.isEmpty()) {
-            System.out.println("❌ Không có sinh viên đăng ký!");
+            System.out.println(" Không có sinh viên đăng ký!");
             return;
         }
 
@@ -115,12 +115,12 @@ public class EnrollmentView {
 
                 case "1":
                     if (currentPage > 1) currentPage--;
-                    else System.out.println("❌ Trang đầu!");
+                    else System.out.println(" Trang đầu!");
                     break;
 
                 case "2":
                     if (currentPage < totalPage) currentPage++;
-                    else System.out.println("❌ Trang cuối!");
+                    else System.out.println(" Trang cuối!");
                     break;
 
                 case "0":
@@ -137,7 +137,7 @@ public class EnrollmentView {
         Enrollment e = enrollmentService.findById(id);
 
         if (e == null) {
-            System.out.println("❌ Không tồn tại!");
+            System.out.println(" Không tồn tại!");
             return;
         }
 
@@ -157,21 +157,21 @@ public class EnrollmentView {
                 break;
 
             default:
-                System.out.println("❌ Không hợp lệ!");
+                System.out.println(" Không hợp lệ!");
                 return;
         }
 
         try {
 
             if (enrollmentService.update(e)) {
-                System.out.println("✅ Cập nhật thành công!");
+                System.out.println(" Cập nhật thành công!");
             } else {
-                System.out.println("❌ Thất bại!");
+                System.out.println(" Thất bại!");
             }
 
         } catch (MyUncheckedException ex) {
 
-            System.out.println("❌ " + ex.getMessage());
+            System.out.println(" " + ex.getMessage());
         }
     }
 
@@ -187,13 +187,13 @@ public class EnrollmentView {
             try {
 
                 if (enrollmentService.delete(id)) {
-                    System.out.println("✅ Đã xóa!");
+                    System.out.println(" Đã xóa!");
                 } else {
-                    System.out.println("❌ Xóa thất bại!");
+                    System.out.println(" Xóa thất bại!");
                 }
 
             } catch (MyUncheckedException e) {
-                System.out.println("❌ " + e.getMessage());
+                System.out.println(" " + e.getMessage());
             }
 
         }

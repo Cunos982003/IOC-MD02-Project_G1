@@ -69,7 +69,7 @@ public class StatisticView {
                     return;
 
                 default:
-                    System.out.println("❌ Lựa chọn không hợp lệ!");
+                    System.out.println(" Lựa chọn không hợp lệ!");
             }
         }
     }

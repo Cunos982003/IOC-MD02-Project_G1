@@ -3,7 +3,6 @@ package ra.coursemanagement.dao.impl;
 import ra.coursemanagement.dao.IAdminDAO;
 import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Admin;
-import ra.coursemanagement.model.Student;
 import ra.coursemanagement.utils.DBUtil;
 
 import java.sql.*;

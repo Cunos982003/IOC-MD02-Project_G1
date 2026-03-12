@@ -50,7 +50,7 @@ public class StudentManagementView {
                 case "0":
                     return;
                 default:
-                    System.out.println("❌ Không hợp lệ!");
+                    System.out.println(" Không hợp lệ!");
             }
         }
     }
@@ -82,7 +82,7 @@ public class StudentManagementView {
                     if (currentPage > 1) {
                         currentPage--;
                     } else {
-                        System.out.println("❌ Đang ở trang đầu!");
+                        System.out.println(" Đang ở trang đầu!");
                     }
                     break;
 
@@ -94,12 +94,12 @@ public class StudentManagementView {
                     if (list.size() == pageSize) {
                         currentPage++;
                     } else {
-                        System.out.println("❌ Đã là trang cuối!");
+                        System.out.println(" Đã là trang cuối!");
                     }
                     break;
 
                 default:
-                    System.out.println("❌ Không hợp lệ!");
+                    System.out.println(" Không hợp lệ!");
             }
         }
     }
@@ -152,7 +152,7 @@ public class StudentManagementView {
             System.out.println();
 
         } catch (MyCheckedException e) {
-            System.out.println("❌ Lỗi paging: " + e.getMessage());
+            System.out.println(" Lỗi paging: " + e.getMessage());
         }
     }
 
@@ -163,12 +163,12 @@ public class StudentManagementView {
         s.inputData(sc);
 
         if (studentService.findByEmail(s.getEmail()) != null) {
-            System.out.println("❌ Email đã tồn tại!");
+            System.out.println(" Email đã tồn tại!");
             return;
         }
 
         studentService.register(s);
-        System.out.println("✅ Thêm thành công!");
+        System.out.println(" Thêm thành công!");
     }
 
     private static void updateStudent(Scanner sc) {
@@ -179,7 +179,7 @@ public class StudentManagementView {
         Student s = studentService.findById(id);
 
         if (s == null) {
-            System.out.println("❌ Không tìm thấy!");
+            System.out.println(" Không tìm thấy!");
             return;
         }
 
@@ -201,9 +201,9 @@ public class StudentManagementView {
                         String name = sc.nextLine().trim();
 
                         if (name.isEmpty()) {
-                            System.out.println("❌ Tên không được để trống!");
+                            System.out.println(" Tên không được để trống!");
                         } else if (name.length() < 3) {
-                            System.out.println("❌ Tên phải ít nhất 3 ký tự!");
+                            System.out.println(" Tên phải ít nhất 3 ký tự!");
                         } else {
                             s.setName(name);
                             break;
@@ -219,9 +219,9 @@ public class StudentManagementView {
                         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
 
                         if (email.isEmpty()) {
-                            System.out.println("❌ Email không được để trống!");
+                            System.out.println(" Email không được để trống!");
                         } else if (!email.matches(emailRegex)) {
-                            System.out.println("❌ Email không đúng định dạng!");
+                            System.out.println(" Email không đúng định dạng!");
                         } else {
                             s.setEmail(email);
                             break;
@@ -237,9 +237,9 @@ public class StudentManagementView {
                         String phoneRegex = "^0\\d{9}$";
 
                         if (phone.isEmpty()) {
-                            System.out.println("❌ SĐT không được để trống!");
+                            System.out.println(" SĐT không được để trống!");
                         } else if (!phone.matches(phoneRegex)) {
-                            System.out.println("❌ SĐT phải 10 số và bắt đầu bằng 0!");
+                            System.out.println(" SĐT phải 10 số và bắt đầu bằng 0!");
                         } else {
                             s.setPhone(phone);
                             break;
@@ -258,7 +258,7 @@ public class StudentManagementView {
                             s.setSex(false);
                             break;
                         } else {
-                            System.out.println("❌ Chỉ nhập 1 hoặc 0!");
+                            System.out.println(" Chỉ nhập 1 hoặc 0!");
                         }
                     }
                     break;
@@ -272,7 +272,7 @@ public class StudentManagementView {
             }
 
             studentService.update(s);
-            System.out.println("✅ Cập nhật thành công!");
+            System.out.println(" Cập nhật thành công!");
         }
     }
 
@@ -284,7 +284,7 @@ public class StudentManagementView {
         Student s = studentService.findById(id);
 
         if (s == null) {
-            System.out.println("❌ Không tồn tại!");
+            System.out.println(" Không tồn tại!");
             return;
         }
 
@@ -292,7 +292,7 @@ public class StudentManagementView {
 
         if (sc.nextLine().equalsIgnoreCase("y")) {
             studentService.delete(id);
-            System.out.println("✅ Đã xóa!");
+            System.out.println(" Đã xóa!");
         }
     }
 
@@ -349,7 +349,7 @@ public class StudentManagementView {
                 break;
 
             default:
-                System.out.println("❌ Không hợp lệ!");
+                System.out.println(" Không hợp lệ!");
                 return;
         }
 

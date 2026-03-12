@@ -74,7 +74,7 @@ public class Student {
         while (true) {
             name = sc.nextLine().trim();
             if (!name.isEmpty()) break;
-            System.out.print("❌ Không được để trống. Nhập lại: ");
+            System.out.print(" Không được để trống. Nhập lại: ");
         }
 
         while (true) {
@@ -83,7 +83,7 @@ public class Student {
                 dob = LocalDate.parse(sc.nextLine());
                 break;
             } catch (Exception e) {
-                System.out.println("❌ Sai định dạng!");
+                System.out.println(" Sai định dạng!");
             }
         }
 
@@ -91,7 +91,7 @@ public class Student {
         while (true) {
             email = sc.nextLine().trim();
             if (!email.isEmpty() && email.contains("@")) break;
-            System.out.print("❌ Email không hợp lệ. Nhập lại: ");
+            System.out.print(" Email không hợp lệ. Nhập lại: ");
         }
 
         while (true) {
@@ -101,7 +101,7 @@ public class Student {
                 sex = input.equals("1");
                 break;
             }
-            System.out.println("❌ Chỉ nhập 1 hoặc 0");
+            System.out.println(" Chỉ nhập 1 hoặc 0");
         }
 
         System.out.print("Nhập số điện thoại: ");
@@ -111,7 +111,7 @@ public class Student {
             System.out.print("Nhập mật khẩu: ");
             password = sc.nextLine();
             if (password.length() >= 6) break;
-            System.out.println("❌ Mật khẩu >= 6 ký tự");
+            System.out.println(" Mật khẩu >= 6 ký tự");
         }
     }
     @Override
