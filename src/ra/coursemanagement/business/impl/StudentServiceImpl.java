@@ -20,7 +20,7 @@ public class StudentServiceImpl implements IStudentService {
         try {
             return studentDao.findAll();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không thể lấy danh sách student: " + e.getMessage());
+            throw new MyUncheckedException("Không thể lấy danh sách student", e);
         }
     }
 
@@ -30,7 +30,7 @@ public class StudentServiceImpl implements IStudentService {
         try {
             return studentDao.findById(id);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không tìm thấy student: " + e.getMessage());
+            throw new MyUncheckedException("Không tìm thấy student", e);
         }
     }
 
@@ -40,7 +40,7 @@ public class StudentServiceImpl implements IStudentService {
         try {
             return studentDao.update(student);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Cập nhật student thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Cập nhật student thất bại", e);
         }
     }
 
@@ -50,7 +50,7 @@ public class StudentServiceImpl implements IStudentService {
         try {
             return studentDao.delete(id);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Xóa student thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Xóa student thất bại", e);
         }
     }
 
@@ -69,7 +69,7 @@ public class StudentServiceImpl implements IStudentService {
             studentDao.saveStudent(student);
 
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Đăng ký thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Đăng ký thất bại", e);
         }
     }
 
@@ -87,7 +87,7 @@ public class StudentServiceImpl implements IStudentService {
             return null;
 
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Lỗi đăng nhập: " + e.getMessage());
+            throw new MyUncheckedException("Lỗi đăng nhập", e);
         }
     }
 
@@ -97,7 +97,7 @@ public class StudentServiceImpl implements IStudentService {
         try {
             return studentDao.findByEmail(email);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không tìm thấy email: " + e.getMessage());
+            throw new MyUncheckedException("Không tìm thấy email", e);
         }
     }
 
@@ -107,7 +107,7 @@ public class StudentServiceImpl implements IStudentService {
         try {
             return studentDao.findAllAndPaging(currentPage, pageSize);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Lỗi phân trang student: " + e.getMessage());
+            throw new MyUncheckedException("Lỗi phân trang student", e);
         }
     }
 
@@ -117,7 +117,7 @@ public class StudentServiceImpl implements IStudentService {
         try {
             return studentDao.count();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không thể đếm student: " + e.getMessage());
+            throw new MyUncheckedException("Không thể đếm student", e);
         }
     }
 

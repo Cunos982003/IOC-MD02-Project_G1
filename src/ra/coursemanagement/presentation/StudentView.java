@@ -12,6 +12,8 @@ import ra.coursemanagement.model.Course;
 import ra.coursemanagement.model.Enrollment;
 import ra.coursemanagement.model.EnrollmentStatus;
 import ra.coursemanagement.model.Student;
+import ra.coursemanagement.utils.InputUtil;
+import ra.coursemanagement.utils.PaginationUtil;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -130,9 +132,8 @@ public class StudentView {
                 return;
             }
 
-            int totalPage = (int) Math.ceil((double) totalCourse / pageSize);
-            if (currentPage > totalPage) currentPage = totalPage;
-            if (currentPage < 1) currentPage = 1;
+            int totalPage = PaginationUtil.totalPages(totalCourse, pageSize);
+            currentPage = PaginationUtil.clampPage(currentPage, totalPage);
 
             List<Course> list = courseService.findAllAndPaging(currentPage, pageSize);
 
@@ -221,8 +222,7 @@ public class StudentView {
 
     private static void registerCourse(Scanner sc) {
         showCourseList(sc);
-        System.out.print("Nhập ID khóa học: ");
-        int courseId = Integer.parseInt(sc.nextLine());
+        int courseId = InputUtil.readInt(sc, "Nhập ID khóa học: ");
 
         if (enrollmentService.existsEnrollment(userLogin.getId(), courseId)) {
             System.out.println(" Bạn đã đăng ký khóa học này!");
@@ -328,7 +328,7 @@ public class StudentView {
         int pageSize = 5;
         int currentPage = 1;
         int total = list.size();
-        int totalPage = (int) Math.ceil((double) total / pageSize);
+        int totalPage = PaginationUtil.totalPages(total, pageSize);
 
         while (true) {
 
@@ -336,8 +336,7 @@ public class StudentView {
                 System.out.println(" Bạn chưa đăng ký khóa học nào!");
                 return;
             }
-            if (currentPage > totalPage) currentPage = totalPage;
-            if (currentPage < 1) currentPage = 1;
+            currentPage = PaginationUtil.clampPage(currentPage, totalPage);
 
             int start = (currentPage - 1) * pageSize;
             int end = Math.min(start + pageSize, total);
@@ -404,8 +403,7 @@ public class StudentView {
             return;
         }
 
-        System.out.print("Nhập ID khóa học muốn hủy: ");
-        int courseId = Integer.parseInt(sc.nextLine());
+        int courseId = InputUtil.readInt(sc, "Nhập ID khóa học muốn hủy: ");
 
         for (Enrollment e : list) {
 

@@ -4,6 +4,8 @@ import ra.coursemanagement.business.IStudentService;
 import ra.coursemanagement.business.impl.StudentServiceImpl;
 import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Student;
+import ra.coursemanagement.utils.InputUtil;
+import ra.coursemanagement.utils.PaginationUtil;
 
 import java.util.Comparator;
 import java.util.List;
@@ -72,9 +74,8 @@ public class StudentManagementView {
                 return;
             }
 
-            int totalPage = (int) Math.ceil((double) total / pageSize);
-            if (currentPage > totalPage) currentPage = totalPage;
-            if (currentPage < 1) currentPage = 1;
+            int totalPage = PaginationUtil.totalPages(total, pageSize);
+            currentPage = PaginationUtil.clampPage(currentPage, totalPage);
 
             List<Student> list = studentService.findAllAndPaging(currentPage, pageSize);
 
@@ -150,7 +151,7 @@ public class StudentManagementView {
 
             int total = studentService.count();
 
-            int totalPage = (int) Math.ceil((double) total / pageSize);
+            int totalPage = PaginationUtil.totalPages(total, pageSize);
 
             System.out.print("\nTrang: ");
 
@@ -187,8 +188,7 @@ public class StudentManagementView {
 
     private static void updateStudent(Scanner sc) {
 
-        System.out.print("Nhập ID cần sửa: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = InputUtil.readInt(sc, "Nhập ID cần sửa: ");
 
         Student s = studentService.findById(id);
 
@@ -292,8 +292,7 @@ public class StudentManagementView {
 
     private static void deleteStudent(Scanner sc) {
 
-        System.out.print("Nhập ID cần xóa: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = InputUtil.readInt(sc, "Nhập ID cần xóa: ");
 
         Student s = studentService.findById(id);
 

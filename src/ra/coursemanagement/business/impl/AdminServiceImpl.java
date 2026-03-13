@@ -23,7 +23,7 @@ public class AdminServiceImpl implements IAdminService {
         try {
             return adminDAO.findAll();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không thể lấy danh sách admin: " + e.getMessage());
+            throw new MyUncheckedException("Không thể lấy danh sách admin", e);
         }
     }
 
@@ -32,7 +32,7 @@ public class AdminServiceImpl implements IAdminService {
         try {
             return adminDAO.findById(id);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không tìm thấy admin: " + e.getMessage());
+            throw new MyUncheckedException("Không tìm thấy admin", e);
         }
     }
 
@@ -41,7 +41,7 @@ public class AdminServiceImpl implements IAdminService {
         try {
             return adminDAO.update(admin);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Cập nhật admin thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Cập nhật admin thất bại", e);
         }
     }
 
@@ -50,7 +50,7 @@ public class AdminServiceImpl implements IAdminService {
         try {
             return adminDAO.delete(id);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Xóa admin thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Xóa admin thất bại", e);
         }
     }
 
@@ -68,7 +68,7 @@ public class AdminServiceImpl implements IAdminService {
             adminDAO.saveAdmin(admin);
 
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Đăng ký admin thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Đăng ký admin thất bại", e);
         }
     }
 
@@ -90,7 +90,7 @@ public class AdminServiceImpl implements IAdminService {
             return admin;
 
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Lỗi hệ thống: " + e.getMessage());
+            throw new MyUncheckedException("Lỗi hệ thống", e);
         }
     }
 }

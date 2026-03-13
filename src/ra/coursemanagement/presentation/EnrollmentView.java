@@ -8,6 +8,8 @@ import ra.coursemanagement.business.impl.CourseServiceImpl;
 import ra.coursemanagement.business.impl.StudentServiceImpl;
 import ra.coursemanagement.exception.MyUncheckedException;
 import ra.coursemanagement.model.*;
+import ra.coursemanagement.utils.InputUtil;
+import ra.coursemanagement.utils.PaginationUtil;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -66,8 +68,7 @@ public class EnrollmentView {
 
     private static void showStudentByCourse() {
 
-        System.out.print("Nhập ID khóa học: ");
-        int courseId = Integer.parseInt(sc.nextLine());
+        int courseId = InputUtil.readInt(sc, "Nhập ID khóa học: ");
 
         int currentPage = 1;
         int total = 0;
@@ -90,9 +91,8 @@ public class EnrollmentView {
                 return;
             }
 
-            totalPage = (int) Math.ceil((double) total / PAGE_SIZE);
-            if (currentPage > totalPage) currentPage = totalPage;
-            if (currentPage < 1) currentPage = 1;
+            totalPage = PaginationUtil.totalPages(total, PAGE_SIZE);
+            currentPage = PaginationUtil.clampPage(currentPage, totalPage);
 
             List<Enrollment> pageList =
                     enrollmentService.findByCourseIdAndPaging(courseId, currentPage, PAGE_SIZE);
@@ -151,9 +151,8 @@ public class EnrollmentView {
                     System.out.println(" Không có enrollment nào đang WAITING!");
                     return;
                 }
-                totalPage = (int) Math.ceil((double) total / PAGE_SIZE);
-                if (currentPage > totalPage) currentPage = totalPage;
-                if (currentPage < 1) currentPage = 1;
+                totalPage = PaginationUtil.totalPages(total, PAGE_SIZE);
+                currentPage = PaginationUtil.clampPage(currentPage, totalPage);
 
                 List<Enrollment> list =
                         enrollmentService.findWaitingAndPaging(currentPage, PAGE_SIZE);
@@ -192,8 +191,7 @@ public class EnrollmentView {
                         else System.out.println(" Trang cuối!");
                         break;
                     case "3":
-                        System.out.print("Nhập ID enrollment (WAITING): ");
-                        int id = Integer.parseInt(sc.nextLine());
+                        int id = InputUtil.readInt(sc, "Nhập ID enrollment (WAITING): ");
 
                         Enrollment e = enrollmentService.findById(id);
                         if (e == null) {
@@ -245,8 +243,7 @@ public class EnrollmentView {
 
     private static void deleteEnrollment(Scanner sc) {
 
-        System.out.print("Nhập ID enrollment: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = InputUtil.readInt(sc, "Nhập ID enrollment: ");
 
         System.out.print("Bạn chắc chắn xóa? (y/n): ");
 

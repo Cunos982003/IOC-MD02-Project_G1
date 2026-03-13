@@ -4,6 +4,8 @@ import ra.coursemanagement.business.ICourseService;
 import ra.coursemanagement.business.impl.CourseServiceImpl;
 import ra.coursemanagement.exception.MyCheckedException;
 import ra.coursemanagement.model.Course;
+import ra.coursemanagement.utils.InputUtil;
+import ra.coursemanagement.utils.PaginationUtil;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -77,9 +79,8 @@ public class CourseView {
                     System.out.println("Danh sách khóa học trống!");
                     return;
                 }
-                int totalPage = (int) Math.ceil((double) total / pageSize);
-                if (currentPage > totalPage) currentPage = totalPage;
-                if (currentPage < 1) currentPage = 1;
+                int totalPage = PaginationUtil.totalPages(total, pageSize);
+                currentPage = PaginationUtil.clampPage(currentPage, totalPage);
 
                 List<Course> list = courseService.findAllAndPaging(currentPage, pageSize);
 
@@ -121,7 +122,7 @@ public class CourseView {
                 case "3":
                     try {
                         int total = courseService.count();
-                        int totalPage = (int) Math.ceil((double) total / pageSize);
+                        int totalPage = PaginationUtil.totalPages(total, pageSize);
                         if (currentPage < totalPage) currentPage++;
                         else System.out.println(" Đã là trang cuối!");
                     } catch (MyCheckedException e) {
@@ -140,7 +141,7 @@ public class CourseView {
 
         int total = courseService.count();
 
-        int totalPage = (int) Math.ceil((double) total / pageSize);
+        int totalPage = PaginationUtil.totalPages(total, pageSize);
 
         for (int i = 1; i <= totalPage; i++) {
 
@@ -201,7 +202,7 @@ public class CourseView {
         while (true) {
             try {
                 System.out.print("Thời lượng: ");
-                duration = Integer.parseInt(scanner.nextLine());
+                duration = InputUtil.readInt(scanner, "");
 
                 if (duration <= 0) {
                     System.out.println(" Duration phải > 0!");
@@ -242,13 +243,7 @@ public class CourseView {
 
         int id;
 
-        try {
-            System.out.print("Nhập ID cần sửa: ");
-            id = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println(" ID phải là số!");
-            return;
-        }
+        id = InputUtil.readInt(scanner, "Nhập ID cần sửa: ");
 
         Course c = courseService.findById(id);
 
@@ -287,7 +282,7 @@ public class CourseView {
                     while (true) {
                         try {
                             System.out.print("Duration mới: ");
-                            int duration = Integer.parseInt(scanner.nextLine());
+                            int duration = InputUtil.readInt(scanner, "");
 
                             if (duration <= 0) {
                                 System.out.println(" Duration phải > 0!");
@@ -333,13 +328,7 @@ public class CourseView {
 
         int id;
 
-        try {
-            System.out.print("Nhập ID cần xóa: ");
-            id = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println(" ID phải là số!");
-            return;
-        }
+        id = InputUtil.readInt(scanner, "Nhập ID cần xóa: ");
 
         Course c = courseService.findById(id);
 

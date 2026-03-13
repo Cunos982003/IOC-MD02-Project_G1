@@ -20,7 +20,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
         try {
             return enrollmentDAO.findAll();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không thể lấy danh sách enrollment: " + e.getMessage());
+            throw new MyUncheckedException("Không thể lấy danh sách enrollment", e);
         }
     }
 
@@ -30,7 +30,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
         try {
             return enrollmentDAO.findById(id);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không tìm thấy enrollment: " + e.getMessage());
+            throw new MyUncheckedException("Không tìm thấy enrollment", e);
         }
     }
 
@@ -48,7 +48,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
             return enrollmentDAO.update(e);
 
         } catch (MyCheckedException ex) {
-            throw new MyUncheckedException("Cập nhật enrollment thất bại: " + ex.getMessage());
+            throw new MyUncheckedException("Cập nhật enrollment thất bại", ex);
         }
     }
 
@@ -66,7 +66,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
             return enrollmentDAO.delete(id);
 
         } catch (MyCheckedException ex) {
-            throw new MyUncheckedException("Xóa enrollment thất bại: " + ex.getMessage());
+            throw new MyUncheckedException("Xóa enrollment thất bại", ex);
         }
     }
 
@@ -75,7 +75,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
         try {
             return enrollmentDAO.findByStudentId(studentId);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không thể lấy khóa học của student: " + e.getMessage());
+            throw new MyUncheckedException("Không thể lấy khóa học của student", e);
         }
     }
 
@@ -85,7 +85,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
         try {
             return enrollmentDAO.existsEnrollment(studentId, courseId);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Lỗi kiểm tra enrollment: " + e.getMessage());
+            throw new MyUncheckedException("Lỗi kiểm tra enrollment", e);
         }
     }
 
@@ -98,7 +98,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
             }
             enrollmentDAO.save(e);
         } catch (MyCheckedException ex) {
-            throw new MyUncheckedException("Đăng ký khóa học thất bại: " + ex.getMessage());
+            throw new MyUncheckedException("Đăng ký khóa học thất bại", ex);
         }
     }
     @Override
@@ -107,7 +107,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
         try {
             return enrollmentDAO.findAllAndPaging(currentPage, pageSize);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Paging enrollment lỗi");
+            throw new MyUncheckedException("Paging enrollment lỗi", e);
         }
     }
     @Override
@@ -116,7 +116,7 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
         try {
             return enrollmentDAO.findByCourseId(courseId);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không lấy được enrollment");
+            throw new MyUncheckedException("Không lấy được enrollment", e);
         }
     }
 

@@ -20,7 +20,7 @@ public class CourseServiceImpl implements ICourseService {
         try {
             return courseDAO.count();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Lỗi đếm course: " + e.getMessage());
+            throw new MyUncheckedException("Lỗi đếm course", e);
         }
 
     }
@@ -30,7 +30,7 @@ public class CourseServiceImpl implements ICourseService {
         try {
             return courseDAO.findAll();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không thể lấy danh sách course: " + e.getMessage());
+            throw new MyUncheckedException("Không thể lấy danh sách course", e);
         }
     }
 
@@ -44,7 +44,7 @@ public class CourseServiceImpl implements ICourseService {
         try {
             return courseDAO.findAllAndPaging(currentPage, pageSize);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Lỗi phân trang course: " + e.getMessage());
+            throw new MyUncheckedException("Lỗi phân trang course", e);
         }
     }
 
@@ -53,7 +53,7 @@ public class CourseServiceImpl implements ICourseService {
         try {
             return courseDAO.findById(id);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không tìm thấy course: " + e.getMessage());
+            throw new MyUncheckedException("Không tìm thấy course", e);
         }
     }
 
@@ -62,7 +62,7 @@ public class CourseServiceImpl implements ICourseService {
         try {
             return courseDAO.update(course);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Cập nhật course thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Cập nhật course thất bại", e);
         }
     }
 
@@ -71,7 +71,7 @@ public class CourseServiceImpl implements ICourseService {
         try {
             return courseDAO.delete(id);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Xóa course thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Xóa course thất bại", e);
         }
     }
 
@@ -87,7 +87,7 @@ public class CourseServiceImpl implements ICourseService {
             courseDAO.saveCourse(course);
 
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Thêm course thất bại: " + e.getMessage());
+            throw new MyUncheckedException("Thêm course thất bại", e);
         }
     }
 
@@ -96,7 +96,7 @@ public class CourseServiceImpl implements ICourseService {
         try {
             return courseDAO.findByName(name);
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không tìm thấy course: " + e.getMessage());
+            throw new MyUncheckedException("Không tìm thấy course", e);
         }
     }
 
@@ -113,7 +113,7 @@ public class CourseServiceImpl implements ICourseService {
                     .collect(Collectors.toList());
 
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Lỗi tìm kiếm course: " + e.getMessage());
+            throw new MyUncheckedException("Lỗi tìm kiếm course", e);
         }
     }
 }

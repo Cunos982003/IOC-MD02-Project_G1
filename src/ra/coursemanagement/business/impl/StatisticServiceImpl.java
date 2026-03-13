@@ -18,7 +18,7 @@ public class StatisticServiceImpl implements IStatisticService {
         try {
             return statisticDAO.countCourse();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không lấy được tổng khóa học");
+            throw new MyUncheckedException("Không lấy được tổng khóa học", e);
         }
     }
 
@@ -27,7 +27,7 @@ public class StatisticServiceImpl implements IStatisticService {
         try {
             return statisticDAO.countStudent();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không lấy được tổng học viên");
+            throw new MyUncheckedException("Không lấy được tổng học viên", e);
         }
     }
 
@@ -36,7 +36,7 @@ public class StatisticServiceImpl implements IStatisticService {
         try {
             return statisticDAO.studentCountByCourse();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không lấy được thống kê");
+            throw new MyUncheckedException("Không lấy được thống kê", e);
         }
     }
 
@@ -45,7 +45,7 @@ public class StatisticServiceImpl implements IStatisticService {
         try {
             return statisticDAO.top5Course();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không lấy được top 5");
+            throw new MyUncheckedException("Không lấy được top 5", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class StatisticServiceImpl implements IStatisticService {
         try {
             return statisticDAO.courseMoreThan10();
         } catch (MyCheckedException e) {
-            throw new MyUncheckedException("Không lấy được khóa học >10");
+            throw new MyUncheckedException("Không lấy được khóa học >10", e);
         }
     }
 }
