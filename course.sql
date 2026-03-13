@@ -50,6 +50,12 @@ CREATE TABLE enrollment (
                                     ON DELETE CASCADE
 );
 
+-- Performance indexes / constraints for common lookups
+CREATE INDEX IF NOT EXISTS idx_enrollment_student_id ON enrollment(student_id);
+CREATE INDEX IF NOT EXISTS idx_enrollment_course_id ON enrollment(course_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_enrollment_student_course ON enrollment(student_id, course_id);
+CREATE INDEX IF NOT EXISTS idx_course_name ON course(name);
+
 INSERT INTO student(name, dob, email, sex, phone, password)
 VALUES
     ('Nguyen Van A','2002-05-10','f@gmail.com',true,'0900000001','$2a$10$testpass1'),

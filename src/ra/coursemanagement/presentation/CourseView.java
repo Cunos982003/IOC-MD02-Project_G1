@@ -72,6 +72,15 @@ public class CourseView {
 
             try {
 
+                int total = courseService.count();
+                if (total == 0) {
+                    System.out.println("Danh sách khóa học trống!");
+                    return;
+                }
+                int totalPage = (int) Math.ceil((double) total / pageSize);
+                if (currentPage > totalPage) currentPage = totalPage;
+                if (currentPage < 1) currentPage = 1;
+
                 List<Course> list = courseService.findAllAndPaging(currentPage, pageSize);
 
                 if (list.isEmpty()) {
@@ -87,9 +96,9 @@ public class CourseView {
             }
 
             System.out.println();
-            System.out.println("1. Previous page");
-            System.out.println("2. Back");
-            System.out.println("3. Next page");
+            System.out.println("1. Trang trước");
+            System.out.println("2. Quay lại");
+            System.out.println("3. Trang sau");
 
             System.out.print("Enter choice: ");
 
@@ -110,7 +119,15 @@ public class CourseView {
                     return;
 
                 case "3":
-                    currentPage++;
+                    try {
+                        int total = courseService.count();
+                        int totalPage = (int) Math.ceil((double) total / pageSize);
+                        if (currentPage < totalPage) currentPage++;
+                        else System.out.println(" Đã là trang cuối!");
+                    } catch (MyCheckedException e) {
+                        System.out.println(" Lỗi paging: " + e.getMessage());
+                        return;
+                    }
                     break;
 
                 default:
@@ -152,7 +169,7 @@ public class CourseView {
                     c.getName(),
                     c.getDuration(),
                     c.getInstructor(),
-                    c.getCreatedAt().format(formatter));
+                    c.getCreatedAt() == null ? "N/A" : c.getCreatedAt().format(formatter));
         }
 
         printPageNumber();

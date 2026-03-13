@@ -56,10 +56,10 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
 
             ps.setInt(1, id);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapResultSet(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSet(rs);
+                }
             }
 
         } catch (SQLException e) {
@@ -116,10 +116,10 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
 
             ps.setInt(1, studentId);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                list.add(mapResultSet(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSet(rs));
+                }
             }
 
         } catch (SQLException e) {
@@ -140,9 +140,9 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
             ps.setInt(1, studentId);
             ps.setInt(2, courseId);
 
-            ResultSet rs = ps.executeQuery();
-
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (SQLException e) {
             throw new MyCheckedException("Lỗi kiểm tra enrollment", e);
@@ -191,10 +191,10 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
             ps.setInt(1, pageSize);
             ps.setInt(2, offset);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                list.add(mapResultSet(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSet(rs));
+                }
             }
 
         } catch (SQLException e) {
@@ -215,10 +215,10 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
 
             ps.setInt(1, courseId);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                list.add(mapResultSet(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSet(rs));
+                }
             }
 
         } catch (SQLException e) {
@@ -226,5 +226,111 @@ public class EnrollmentDAOImpl implements IEnrollmentDAO {
         }
 
         return list;
+    }
+
+    @Override
+    public List<Enrollment> findByCourseIdAndPaging(int courseId, int currentPage, int pageSize) throws MyCheckedException {
+
+        List<Enrollment> list = new ArrayList<>();
+
+        String sql = """
+                SELECT * FROM enrollment
+                WHERE course_id = ?
+                ORDER BY id
+                LIMIT ? OFFSET ?
+                """;
+
+        int offset = (currentPage - 1) * pageSize;
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, courseId);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSet(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi paging enrollment theo course", e);
+        }
+
+        return list;
+    }
+
+    @Override
+    public int countByCourseId(int courseId) throws MyCheckedException {
+
+        String sql = "SELECT COUNT(*) FROM enrollment WHERE course_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, courseId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi đếm enrollment theo course", e);
+        }
+
+        return 0;
+    }
+
+    @Override
+    public List<Enrollment> findWaitingAndPaging(int currentPage, int pageSize) throws MyCheckedException {
+
+        List<Enrollment> list = new ArrayList<>();
+
+        String sql = """
+                SELECT * FROM enrollment
+                WHERE status = 'WAITING'
+                ORDER BY id
+                LIMIT ? OFFSET ?
+                """;
+
+        int offset = (currentPage - 1) * pageSize;
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSet(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi paging enrollment WAITING", e);
+        }
+
+        return list;
+    }
+
+    @Override
+    public int countWaiting() throws MyCheckedException {
+
+        String sql = "SELECT COUNT(*) FROM enrollment WHERE status = 'WAITING'";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) return rs.getInt(1);
+
+        } catch (SQLException e) {
+            throw new MyCheckedException("Lỗi đếm enrollment WAITING", e);
+        }
+
+        return 0;
     }
 }

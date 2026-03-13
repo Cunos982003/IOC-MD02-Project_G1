@@ -117,6 +117,23 @@ public class StudentView {
 
         while (true) {
 
+            int totalCourse = 0;
+            try {
+                totalCourse = courseService.count();
+            } catch (MyCheckedException e) {
+                System.out.println(e.getMessage());
+                return;
+            }
+
+            if (totalCourse == 0) {
+                System.out.println(" Không có khóa học nào!");
+                return;
+            }
+
+            int totalPage = (int) Math.ceil((double) totalCourse / pageSize);
+            if (currentPage > totalPage) currentPage = totalPage;
+            if (currentPage < 1) currentPage = 1;
+
             List<Course> list = courseService.findAllAndPaging(currentPage, pageSize);
 
             if (list.isEmpty()) {
@@ -137,14 +154,6 @@ public class StudentView {
                         c.getInstructor());
             }
 
-            int totalCourse = 0;
-            try {
-                totalCourse = courseService.count();
-            } catch (MyCheckedException e) {
-                System.out.println(e.getMessage());
-            }
-            int totalPage = (int) Math.ceil((double) totalCourse / pageSize);
-
             System.out.println();
 
             for (int i = 1; i <= totalPage; i++) {
@@ -156,11 +165,11 @@ public class StudentView {
             }
 
             System.out.println();
-            System.out.println("1. Previous page");
-            System.out.println("2. Back");
-            System.out.println("3. Next page");
+            System.out.println("1. Trang trước");
+            System.out.println("2. Quay lại");
+            System.out.println("3. Trang tiếp");
 
-            System.out.print("Enter choice: ");
+            System.out.print("Chọn: ");
             String choice = sc.nextLine();
 
             switch (choice) {
@@ -322,6 +331,13 @@ public class StudentView {
         int totalPage = (int) Math.ceil((double) total / pageSize);
 
         while (true) {
+
+            if (totalPage == 0) {
+                System.out.println(" Bạn chưa đăng ký khóa học nào!");
+                return;
+            }
+            if (currentPage > totalPage) currentPage = totalPage;
+            if (currentPage < 1) currentPage = 1;
 
             int start = (currentPage - 1) * pageSize;
             int end = Math.min(start + pageSize, total);

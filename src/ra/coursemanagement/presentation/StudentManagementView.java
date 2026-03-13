@@ -59,6 +59,23 @@ public class StudentManagementView {
 
         while (true) {
 
+            int total = 0;
+            try {
+                total = studentService.count();
+            } catch (MyCheckedException e) {
+                System.out.println(" Lỗi paging: " + e.getMessage());
+                return;
+            }
+
+            if (total == 0) {
+                System.out.println("Danh sách học viên trống!");
+                return;
+            }
+
+            int totalPage = (int) Math.ceil((double) total / pageSize);
+            if (currentPage > totalPage) currentPage = totalPage;
+            if (currentPage < 1) currentPage = 1;
+
             List<Student> list = studentService.findAllAndPaging(currentPage, pageSize);
 
             if (list.isEmpty()) {
@@ -91,11 +108,8 @@ public class StudentManagementView {
                     return;
 
                 case "3":
-                    if (list.size() == pageSize) {
-                        currentPage++;
-                    } else {
-                        System.out.println(" Đã là trang cuối!");
-                    }
+                    if (currentPage < totalPage) currentPage++;
+                    else System.out.println(" Đã là trang cuối!");
                     break;
 
                 default:

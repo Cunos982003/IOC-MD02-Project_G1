@@ -25,7 +25,7 @@ public class StudentDAOImpl implements IStudentDAO {
     }
 
     @Override
-    public List<Student> findAll() {
+    public List<Student> findAll() throws MyCheckedException {
         List<Student> list = new ArrayList<>();
         String sql = "SELECT * FROM student";
 
@@ -38,35 +38,35 @@ public class StudentDAOImpl implements IStudentDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi lấy danh sách student", e);
         }
 
         return list;
     }
 
     @Override
-    public Student findById(Integer id) {
+    public Student findById(Integer id) throws MyCheckedException {
         String sql = "SELECT * FROM student WHERE id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapResultSet(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSet(rs);
+                }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi tìm student theo ID", e);
         }
 
         return null;
     }
 
     @Override
-    public void saveStudent(Student student) {
+    public void saveStudent(Student student) throws MyCheckedException {
         String sql = "INSERT INTO STUDENT(name, dob, email, sex, phone, password)" +
                 " values(?,?,?,?,?,?)";
         try (
@@ -81,13 +81,13 @@ public class StudentDAOImpl implements IStudentDAO {
             pre.setString(6, student.getPassword());
             pre.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi thêm student", e);
         }
     }
 
 
     @Override
-    public boolean update(Student student) {
+    public boolean update(Student student) throws MyCheckedException {
         String sql = """
                 UPDATE student
                 SET name=?, dob=?, email=?, sex=?, phone=?, password=?
@@ -108,14 +108,12 @@ public class StudentDAOImpl implements IStudentDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.out.println("Lỗi cập nhật student: " + e.getMessage());
+            throw new MyCheckedException("Lỗi cập nhật student", e);
         }
-
-        return false;
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean delete(Integer id) throws MyCheckedException {
         String sql = "DELETE FROM student WHERE id = ?";
 
         try (Connection conn = DBUtil.getConnection();
@@ -125,28 +123,26 @@ public class StudentDAOImpl implements IStudentDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.out.println("Lỗi xóa student: " + e.getMessage());
+            throw new MyCheckedException("Lỗi xóa student", e);
         }
-
-        return false;
     }
 
     @Override
-    public Student findByEmail(String email) {
+    public Student findByEmail(String email) throws MyCheckedException {
         String sql = "SELECT * FROM student WHERE email = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapResultSet(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSet(rs);
+                }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi tìm student theo email", e);
         }
 
         return null;
@@ -174,7 +170,7 @@ public class StudentDAOImpl implements IStudentDAO {
     }
 
     @Override
-    public List<Student> findAllAndPaging(int currentPage, int pageSize) {
+    public List<Student> findAllAndPaging(int currentPage, int pageSize) throws MyCheckedException {
 
         List<Student> list = new ArrayList<>();
 
@@ -188,24 +184,21 @@ public class StudentDAOImpl implements IStudentDAO {
             ps.setInt(1, pageSize);
             ps.setInt(2, offset);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-
-                Student s = new Student();
-
-                s.setId(rs.getInt("id"));
-                s.setName(rs.getString("name"));
-                s.setDob(rs.getDate("dob").toLocalDate());
-                s.setEmail(rs.getString("email"));
-                s.setSex(rs.getBoolean("sex"));
-                s.setPhone(rs.getString("phone"));
-
-                list.add(s);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Student s = new Student();
+                    s.setId(rs.getInt("id"));
+                    s.setName(rs.getString("name"));
+                    s.setDob(rs.getDate("dob").toLocalDate());
+                    s.setEmail(rs.getString("email"));
+                    s.setSex(rs.getBoolean("sex"));
+                    s.setPhone(rs.getString("phone"));
+                    list.add(s);
+                }
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new MyCheckedException("Lỗi paging student", e);
         }
 
         return list;

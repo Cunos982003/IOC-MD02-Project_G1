@@ -42,8 +42,8 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
             if (old == null) {
                 throw new MyUncheckedException("Enrollment không tồn tại!");
             }
-            if (old.getStatus() == EnrollmentStatus.CONFIRM) {
-                throw new MyUncheckedException("Không thể sửa khóa đã CONFIRM!");
+            if (old.getStatus() != EnrollmentStatus.WAITING) {
+                throw new MyUncheckedException("Chỉ được cập nhật enrollment có trạng thái WAITING!");
             }
             return enrollmentDAO.update(e);
 
@@ -117,6 +117,42 @@ public class EnrollmentServiceImpl implements IEnrollmentService {
             return enrollmentDAO.findByCourseId(courseId);
         } catch (MyCheckedException e) {
             throw new MyUncheckedException("Không lấy được enrollment");
+        }
+    }
+
+    @Override
+    public List<Enrollment> findByCourseIdAndPaging(int courseId, int currentPage, int pageSize) {
+        try {
+            return enrollmentDAO.findByCourseIdAndPaging(courseId, currentPage, pageSize);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không lấy được enrollment theo course (paging)", e);
+        }
+    }
+
+    @Override
+    public int countByCourseId(int courseId) {
+        try {
+            return enrollmentDAO.countByCourseId(courseId);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không thể đếm enrollment theo course", e);
+        }
+    }
+
+    @Override
+    public List<Enrollment> findWaitingAndPaging(int currentPage, int pageSize) {
+        try {
+            return enrollmentDAO.findWaitingAndPaging(currentPage, pageSize);
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không thể lấy danh sách enrollment WAITING (paging)", e);
+        }
+    }
+
+    @Override
+    public int countWaiting() {
+        try {
+            return enrollmentDAO.countWaiting();
+        } catch (MyCheckedException e) {
+            throw new MyUncheckedException("Không thể đếm enrollment WAITING", e);
         }
     }
 }

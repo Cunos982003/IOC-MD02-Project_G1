@@ -68,10 +68,10 @@ public class AdminDAOImpl implements IAdminDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapResultSet(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSet(rs);
+                }
             }
 
         } catch (SQLException e) {
@@ -91,10 +91,10 @@ public class AdminDAOImpl implements IAdminDAO {
 
             ps.setString(1, username);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapResultSet(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSet(rs);
+                }
             }
 
         } catch (SQLException e) {

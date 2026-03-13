@@ -9,6 +9,6 @@ public class MyCheckedException extends Exception{
         super(message, e);
     }
     public MyCheckedException(String message, SQLException e) {
-        super(message);
+        super(message, e);
     }
 }

@@ -60,18 +60,10 @@ public class CourseDAOImpl implements ICourseDAO {
             ps.setInt(1, pageSize);
             ps.setInt(2, offset);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-
-                Course c = new Course();
-
-                c.setId(rs.getInt("id"));
-                c.setName(rs.getString("name"));
-                c.setDuration(rs.getInt("duration"));
-                c.setInstructor(rs.getString("instructor"));
-
-                list.add(c);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSet(rs));
+                }
             }
 
         } catch (Exception e) {
