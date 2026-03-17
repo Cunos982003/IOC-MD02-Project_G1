@@ -22,19 +22,24 @@ public class AdminView {
             System.out.print("Password: ");
             String password = sc.nextLine().trim();
 
-            if (username.isEmpty() || password.isEmpty()) {
-                System.out.println(" Không được để trống!");
-                continue;
-            }
+            try {
 
-            Admin admin = adminService.login(username, password);
+                if (username.isEmpty() || password.isEmpty()) {
+                    System.out.println(" Không được để trống!");
+                    continue;
+                }
 
-            if (admin == null) {
-                System.out.println(" Sai email hoặc mật khẩu!");
-            } else {
-                System.out.println(" Đăng nhập thành công!");
-                showAdminMenu(sc);
-                break;
+                Admin admin = adminService.login(username, password);
+
+                if (admin == null) {
+                    System.out.println(" Sai email hoặc mật khẩu!");
+                } else {
+                    System.out.println(" Đăng nhập thành công!");
+                    showAdminMenu(sc);
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         }
     }
