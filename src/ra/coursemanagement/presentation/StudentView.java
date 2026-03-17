@@ -253,6 +253,7 @@ public class StudentView {
             return;
         }
 
+
         System.out.print("Nhập mật khẩu cũ: ");
         String oldPass = sc.nextLine();
 
@@ -268,6 +269,11 @@ public class StudentView {
             System.out.println(" Mật khẩu phải ≥ 6 ký tự!");
             return;
         }
+        if(newPass.equals(oldPass)) {
+            System.out.println(" Mật khẩu không trùng với mật khẩu cũ");
+            return;
+        }
+
 
         String hash = BCrypt.hashpw(newPass, BCrypt.gensalt(10));
 
